@@ -1,0 +1,108 @@
+/* Blog Admin Panel Styles - Forzar texto negro en dropdowns */
+
+/* Clase personalizada para dropdowns */
+.dropdown-black-text .ant-select-item-option-content,
+.dropdown-black-text .ant-select-item-option-content *,
+.dropdown-black-text .ant-select-item,
+.dropdown-black-text .ant-select-item * {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Opciones del dropdown */
+.ant-select-item-option-content,
+.ant-select-item-option-content * {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Item seleccionado en el dropdown */
+.ant-select-selection-item,
+.ant-select-selection-item * {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Container del dropdown */
+.ant-select-dropdown,
+.ant-select-dropdown * {
+  color: #000000 !important;
+}
+
+/* Cada item en la lista */
+.ant-select-item,
+.ant-select-item * {
+  color: #000000 !important;
+}
+
+/* El selector (input visible) */
+.ant-select-selector,
+.ant-select-selector *,
+.ant-select-selection-search-input {
+  color: #000000 !important;
+}
+
+/* Placeholder */
+.ant-select-selection-placeholder {
+  color: #666666 !important;
+  opacity: 1 !important;
+}
+
+/* Hover state */
+.ant-select-item-option-active,
+.ant-select-item-option-active * {
+  background-color: #f0f0f0 !important;
+  color: #000000 !important;
+}
+
+/* Selected state */
+.ant-select-item-option-selected,
+.ant-select-item-option-selected * {
+  background-color: #e6f7ff !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Focused state */
+.ant-select-focused .ant-select-selector,
+.ant-select-focused .ant-select-selector * {
+  color: #000000 !important;
+}
+
+/* Open state */
+.ant-select-open .ant-select-selector,
+.ant-select-open .ant-select-selector * {
+  color: #000000 !important;
+}
+
+/* Para el dropdown específico del modal */
+.ant-modal .ant-select-item-option-content,
+.ant-modal .ant-select-selection-item,
+.ant-modal .ant-select-selector {
+  color: #000000 !important;
+}
+
+/* Override de cualquier estilo de Ant Design */
+div[class*="ant-select"] {
+  color: #000000 !important;
+}
+
+div[class*="ant-select"] * {
+  color: inherit !important;
+}
+
+/* Estilos adicionales para el formulario de generación de artículos */
+.generate-article-form .ant-select-selector,
+.generate-article-form .ant-select-selector *,
+.generate-article-form .ant-select-selection-item,
+.generate-article-form .ant-select-selection-item * {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Estilos para el texto dentro de span */
+.ant-select-item-option span,
+.ant-select-selection-item span {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}

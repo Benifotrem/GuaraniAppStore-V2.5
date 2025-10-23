@@ -1,0 +1,294 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import './TermsConditions.css';
+
+const TermsConditions = () => {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              📜 Términos y Condiciones
+            </h1>
+            <p className="text-xl text-slate-300 mb-2">
+              GuaraniAppStore - Última actualización: Enero 2025
+            </p>
+            <p className="text-slate-400">
+              Propiedad de: César Ruzafa Alberola
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-lg p-8 md:p-12 space-y-8">
+            
+            {/* Welcome */}
+            <div className="border-l-4 border-emerald-600 pl-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                ¡Bienvenido a GuaraniAppStore!
+              </h2>
+              <p className="text-gray-700 leading-relaxed">
+                Estos términos y condiciones describen las reglas y regulaciones para el uso del sitio web de César Ruzafa Alberola, ubicado en <a href="https://guaraniappstore.com" className="text-emerald-600 hover:underline font-semibold">https://guaraniappstore.com</a>.
+              </p>
+              <p className="text-gray-700 leading-relaxed mt-4">
+                Al acceder a este sitio web, asumimos que aceptas estos términos y condiciones. <strong>No continúes usando GuaraniAppStore si no estás de acuerdo con todos los términos y condiciones establecidos en esta página.</strong>
+              </p>
+            </div>
+
+            {/* Cookies */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                🍪 Cookies
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                El sitio web utiliza cookies para ayudar a personalizar tu experiencia en línea. Al acceder a GuaraniAppStore, aceptaste usar las cookies requeridas.
+              </p>
+              
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">¿Qué es una cookie?</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Una cookie es un archivo de texto que un servidor de página web coloca en tu disco duro. Las cookies no pueden usarse para ejecutar programas o entregar virus a tu computadora. Las cookies se te asignan de manera única y solo pueden ser leídas por un servidor web en el dominio que te emitió la cookie.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Podemos usar cookies para recopilar, almacenar y rastrear información con fines estadísticos o de marketing para operar nuestro sitio web. Tienes la capacidad de aceptar o rechazar cookies opcionales.
+              </p>
+              
+              <div className="bg-amber-50 border-l-4 border-amber-500 p-4 my-4">
+                <h4 className="font-semibold text-amber-900 mb-2">⚠️ Cookies Requeridas</h4>
+                <p className="text-amber-800 text-sm leading-relaxed">
+                  Hay algunas cookies requeridas que son necesarias para la operación de nuestro sitio web. Estas cookies no requieren tu consentimiento ya que siempre funcionan. Ten en cuenta que al aceptar las cookies requeridas, también aceptas cookies de terceros, que pueden usarse a través de servicios proporcionados por terceros si utilizas dichos servicios en nuestro sitio web.
+                </p>
+              </div>
+            </div>
+
+            {/* Licencia */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                📄 Licencia
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                A menos que se indique lo contrario, <strong>César Ruzafa Alberola</strong> y/o sus licenciantes poseen los derechos de propiedad intelectual de todo el material en GuaraniAppStore. Todos los derechos de propiedad intelectual están reservados. Puedes acceder a esto desde GuaraniAppStore para tu uso personal sujeto a las restricciones establecidas en estos términos y condiciones.
+              </p>
+              
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 my-4">
+                <h4 className="font-semibold text-red-900 mb-2">🚫 No debes:</h4>
+                <ul className="list-disc list-inside text-red-800 space-y-2">
+                  <li>Copiar o republicar material de GuaraniAppStore</li>
+                  <li>Vender, alquilar o sublicenciar material de GuaraniAppStore</li>
+                  <li>Reproducir, duplicar o copiar material de GuaraniAppStore</li>
+                  <li>Redistribuir contenido de GuaraniAppStore</li>
+                </ul>
+              </div>
+              
+              <p className="text-gray-700 leading-relaxed mt-4">
+                Este Acuerdo comenzará en la fecha del presente.
+              </p>
+            </div>
+
+            {/* Comentarios de Usuarios */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                💬 Comentarios de Usuarios
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Partes de este sitio web ofrecen a los usuarios la oportunidad de publicar e intercambiar opiniones e información en ciertas áreas del sitio web. César Ruzafa Alberola no filtra, edita, publica ni revisa los comentarios antes de su presencia en el sitio web.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Los comentarios no reflejan las opiniones y puntos de vista de César Ruzafa Alberola, sus agentes y/o afiliados. Los comentarios reflejan las opiniones y puntos de vista de la persona que publica sus opiniones y puntos de vista.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                En la medida permitida por las leyes aplicables, César Ruzafa Alberola no será responsable de los comentarios ni de ninguna responsabilidad, daños o gastos causados y/o sufridos como resultado de cualquier uso de y/o publicación de y/o apariencia de los comentarios en este sitio web.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                César Ruzafa Alberola se reserva el derecho de monitorear todos los comentarios y eliminar cualquier comentario que pueda considerarse inapropiado, ofensivo o que cause violación de estos Términos y Condiciones.
+              </p>
+              
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 my-4">
+                <h4 className="font-semibold text-blue-900 mb-2">✅ Garantizas y representas que:</h4>
+                <ul className="list-disc list-inside text-blue-800 space-y-2 text-sm">
+                  <li>Tienes derecho a publicar los comentarios en nuestro sitio web y tienes todas las licencias y consentimientos necesarios para hacerlo</li>
+                  <li>Los comentarios no invaden ningún derecho de propiedad intelectual, incluidos, entre otros, derechos de autor, patentes o marcas registradas de terceros</li>
+                  <li>Los comentarios no contienen ningún material difamatorio, calumnioso, ofensivo, indecente o ilegal que sea una invasión de la privacidad</li>
+                  <li>Los comentarios no se utilizarán para solicitar o promover negocios o actividades comerciales o ilegales</li>
+                </ul>
+              </div>
+              
+              <p className="text-gray-700 leading-relaxed mt-4">
+                Por la presente, otorgas a César Ruzafa Alberola una licencia no exclusiva para usar, reproducir, editar y autorizar a otros a usar, reproducir y editar cualquiera de tus comentarios en todas y cada una de las formas, formatos o medios.
+              </p>
+            </div>
+
+            {/* Hipervínculos */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                🔗 Hipervínculos a Nuestro Contenido
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Las siguientes organizaciones pueden vincular a nuestro sitio web sin aprobación previa por escrito:
+              </p>
+              
+              <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
+                <li>Agencias gubernamentales</li>
+                <li>Motores de búsqueda</li>
+                <li>Organizaciones de noticias</li>
+                <li>Distribuidores de directorios en línea</li>
+                <li>Empresas acreditadas en todo el sistema (excepto organizaciones sin fines de lucro solicitantes)</li>
+              </ul>
+              
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">Condiciones para enlaces:</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Estas organizaciones pueden vincular a nuestra página de inicio, publicaciones u otra información del sitio web siempre que el enlace:
+              </p>
+              
+              <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
+                <li>No sea de ninguna manera engañoso</li>
+                <li>No implique falsamente patrocinio, respaldo o aprobación de la parte vinculante y sus productos/servicios</li>
+                <li>Se ajuste al contexto del sitio de la parte vinculante</li>
+              </ul>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Si estás interesado en vincular a nuestro sitio web, debes informarnos enviando un correo electrónico a <a href="mailto:admin@guaraniappstore.com" className="text-emerald-600 hover:underline font-semibold">admin@guaraniappstore.com</a>. Incluye tu nombre, el nombre de tu organización, información de contacto, la URL de tu sitio, una lista de las URL desde las que pretendes vincular a nuestro sitio web y una lista de las URL en nuestro sitio a las que te gustaría vincular. Espera 2-3 semanas para una respuesta.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed">
+                No se permitirá el uso del logotipo de César Ruzafa Alberola u otra obra de arte para vincular sin un acuerdo de licencia de marca registrada.
+              </p>
+            </div>
+
+            {/* Responsabilidad del Contenido */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                ⚖️ Responsabilidad del Contenido
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                No seremos responsables de ningún contenido que aparezca en tu sitio web. Aceptas protegernos y defendernos contra todas las reclamaciones que se presenten en tu sitio web.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed">
+                No deben aparecer enlaces en ningún sitio web que puedan interpretarse como calumniosos, obscenos o criminales, o que infrinjan, violen de otro modo o defiendan la infracción u otra violación de los derechos de terceros.
+              </p>
+            </div>
+
+            {/* Reserva de Derechos */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                🛡️ Reserva de Derechos
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Nos reservamos el derecho de solicitar que elimines todos los enlaces o cualquier enlace particular a nuestro sitio web. Apruebas eliminar inmediatamente todos los enlaces a nuestro sitio web a solicitud.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed">
+                También nos reservamos el derecho de modificar estos términos y condiciones y su política de enlaces en cualquier momento. Al vincular continuamente a nuestro sitio web, aceptas estar sujeto y seguir estos términos y condiciones de vinculación.
+              </p>
+            </div>
+
+            {/* Eliminación de Enlaces */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                🗑️ Eliminación de Enlaces de Nuestro Sitio Web
+              </h2>
+              <p className="text-gray-700 leading-relaxed">
+                Si encuentras algún enlace en nuestro sitio web que sea ofensivo por cualquier motivo, eres libre de contactarnos e informarnos en cualquier momento. Consideraremos las solicitudes para eliminar enlaces, pero no estamos obligados a hacerlo o a responderte directamente.
+              </p>
+            </div>
+
+            {/* Descargo de Responsabilidad */}
+            <div className="terms-section">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                ⚠️ Descargo de Responsabilidad
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                En la medida máxima permitida por la ley aplicable, excluimos todas las representaciones, garantías y condiciones relacionadas con nuestro sitio web y el uso de este sitio web.
+              </p>
+              
+              <div className="bg-slate-100 p-6 rounded-lg my-4">
+                <h4 className="font-semibold text-slate-900 mb-3">Nada en este descargo de responsabilidad:</h4>
+                <ul className="list-disc list-inside text-slate-800 space-y-2">
+                  <li>Limitará o excluirá nuestra o tu responsabilidad por muerte o lesiones personales</li>
+                  <li>Limitará o excluirá nuestra o tu responsabilidad por fraude o tergiversación fraudulenta</li>
+                  <li>Limitará cualquiera de nuestras o tus responsabilidades de cualquier manera que no esté permitida bajo la ley aplicable</li>
+                  <li>Excluirá cualquiera de nuestras o tus responsabilidades que no puedan ser excluidas bajo la ley aplicable</li>
+                </ul>
+              </div>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Las limitaciones y prohibiciones de responsabilidad establecidas en esta sección y en otras partes de este descargo de responsabilidad: (a) están sujetas al párrafo anterior; y (b) rigen todas las responsabilidades que surjan bajo el descargo de responsabilidad, incluidas las responsabilidades que surjan en contrato, por agravio y por incumplimiento del deber legal.
+              </p>
+              
+              <div className="bg-red-50 border-l-4 border-red-500 p-6 my-6">
+                <h4 className="font-bold text-red-900 mb-3 text-lg">⚠️ Importante:</h4>
+                <ul className="space-y-3 text-red-800">
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>No garantizamos que la información en este sitio web sea correcta. No garantizamos su integridad o precisión, ni prometemos asegurar que el sitio web permanezca disponible o que el material en el sitio web se mantenga actualizado.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Siempre que el sitio web y la información y los servicios en el sitio web se proporcionen de forma gratuita, no seremos responsables de ninguna pérdida o daño de cualquier naturaleza.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer Info */}
+            <div className="border-t-2 border-gray-200 pt-6 mt-8">
+              <div className="bg-emerald-50 p-6 rounded-lg">
+                <h3 className="text-lg font-bold text-emerald-900 mb-3">📌 Información Legal</h3>
+                <div className="space-y-2 text-emerald-800">
+                  <p><strong>Última actualización:</strong> Enero 2025</p>
+                  <p><strong>Propietario:</strong> César Ruzafa Alberola</p>
+                  <p><strong>Sitio web:</strong> <a href="https://guaraniappstore.com" className="text-emerald-600 hover:underline font-semibold">https://guaraniappstore.com</a></p>
+                  <p><strong>Contacto:</strong> <a href="mailto:admin@guaraniappstore.com" className="text-emerald-600 hover:underline font-semibold">admin@guaraniappstore.com</a></p>
+                </div>
+                <p className="text-sm text-emerald-700 mt-4">
+                  Estos términos y condiciones aplican a todos los dominios de GuaraniAppStore, incluyendo subdominios de desarrollo y producción.
+                </p>
+                <p className="font-semibold text-emerald-900 mt-4 text-center">
+                  Al utilizar GuaraniAppStore, aceptas estos términos y condiciones en su totalidad.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center pt-8">
+              <p className="text-gray-600 mb-6">
+                ¿Tienes preguntas sobre nuestros términos?
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/faq"
+                  className="inline-block bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+                >
+                  Ver Preguntas Frecuentes
+                </Link>
+                <a
+                  href="mailto:admin@guaraniappstore.com"
+                  className="inline-block bg-slate-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors"
+                >
+                  Contactar Soporte
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default TermsConditions;

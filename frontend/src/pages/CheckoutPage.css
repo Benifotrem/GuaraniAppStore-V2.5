@@ -1,0 +1,13 @@
+.checkout-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%);
+}
+
+.checkout-page input[type="radio"]:checked {
+  accent-color: var(--emerald-500);
+}
+
+.checkout-page input[type="radio"]:focus {
+  outline: 2px solid var(--emerald-400);
+  outline-offset: 2px;
+}

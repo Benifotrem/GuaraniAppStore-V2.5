@@ -812,7 +812,7 @@ class GuaraniBackendTester:
     def print_summary(self):
         """Print test summary focusing on Momentum Predictor IA"""
         print("=" * 70)
-        print("TEST SUMMARY - MOMENTUM PREDICTOR IA FASE 1 INTEGRACIÓN")
+        print("TEST SUMMARY - MOMENTUM PREDICTOR IA FASE 2 LÓGICA COMPLETA")
         print("=" * 70)
         
         total_tests = len(self.test_results)

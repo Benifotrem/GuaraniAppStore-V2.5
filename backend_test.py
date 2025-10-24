@@ -851,6 +851,13 @@ class GuaraniBackendTester:
         print(f"   /api/momentum/stats/{{symbol}}:  {'✅ WORKING' if momentum_stats else '❌ FAILED'}")
         print()
         
+        print("🧮 FASE 2 TECHNICAL ANALYSIS FEATURES:")
+        print(f"   Signal Variety (not all HOLD):  {'✅ WORKING' if signal_variety else '❌ FAILED'}")
+        print(f"   Dynamic Confidence Calculation: {'✅ WORKING' if confidence_variation else '❌ FAILED'}")
+        print(f"   Scoring System Logic (8 points): {'✅ WORKING' if scoring_logic else '❌ FAILED'}")
+        print(f"   Technical Indicators Realism:   {'✅ WORKING' if indicators_realism else '❌ FAILED'}")
+        print()
+        
         print("🔧 CORE SYSTEM STATUS:")
         print(f"   /api/countries: {'✅ WORKING' if countries_success else '❌ FAILED'}")
         print(f"   /api/services:  {'✅ WORKING' if services_success else '❌ FAILED'}")

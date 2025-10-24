@@ -517,6 +517,57 @@ frontend:
 
 agent_communication:
   - agent: "main"
+    message: "🎯 MOMENTUM PREDICTOR IA - FASE 2 IMPLEMENTACIÓN COMPLETADA
+
+✅ ANÁLISIS TÉCNICO COMPLETO:
+• Sistema de scoring mejorado (8 puntos máximo)
+• 20 indicadores técnicos calculados:
+  - RSI (14 períodos) - Overbought/Oversold
+  - MACD + Signal - Tendencia
+  - SMA (7/25 días) - Moving averages
+  - EMA (12/26 días) - Exponential averages
+  - Bollinger Bands (upper/middle/lower) - Volatilidad
+  - Stochastic (K/D) - Momentum
+  - ATR - Average True Range
+  - Momentum & Price change %
+
+✅ SISTEMA DE SCORING:
+• RSI: 2 puntos (oversold→BUY, overbought→SELL)
+• MACD: 2 puntos (cruce alcista→BUY, bajista→SELL)
+• Moving Averages: 2 puntos (precio>SMA7>SMA25→BUY)
+• Bollinger Bands: 1 punto (precio<BB_lower→BUY)
+• Stochastic: 1 punto (K<20→BUY, K>80→SELL)
+
+✅ SEÑALES MEJORADAS:
+• BUY: buy_score >= sell_score + 2
+• SELL: sell_score >= buy_score + 2
+• HOLD: diferencia < 2 puntos
+• Confianza: 50% + (diferencia × 8%), max 85%
+• Probabilities dinámicas basadas en scores
+
+✅ RESPUESTA API ENRIQUECIDA:
+• Campo 'indicators' agregado con:
+  - rsi, macd, sma_7, sma_25, stoch_k
+  - buy_score, sell_score (transparencia)
+• model_version: MOCK_v2_Technical_Analysis
+
+✅ BOT DE TELEGRAM:
+• Token: MOMENTUM_BOT_TOKEN configurado
+• Comandos: /start, /signal, /history, /stats, /help
+• Botones inline: BTC, ETH, My Signals, Help
+• Formato Markdown con emojis
+• Integración completa con MongoDB
+• Script: start_momentum_bot.sh
+
+✅ SEÑALES PROBADAS:
+• ETH ($3,953): HOLD 60% - RSI:45.5, MACD:-113.6, scores 1-2
+• SOL ($192): HOLD 60% - RSI:46.2, MACD:-7.7, scores 1-2
+• BTC ($111,090): HOLD 60% - RSI:47.1, MACD:-1850, scores 1-2
+
+PRÓXIMO PASO:
+• Testing completo de la Fase 2 con agente de testing
+• Después: Implementar CryptoShield IA"
+  - agent: "main"
     message: "🎯 MOMENTUM PREDICTOR IA - FASE 1 INTEGRACIÓN COMPLETADA
 
 ✅ DEPENDENCIAS INSTALADAS:

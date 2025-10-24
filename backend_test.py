@@ -33,7 +33,7 @@ class GuaraniBackendTester:
         # CryptoShield test data
         self.test_wallets = [
             '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',  # Vitalik Buterin
-            '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',   # Binance Hot Wallet
+            '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb6',  # Binance Hot Wallet (fixed)
             '0x0000000000000000000000000000000000000000'    # Null address
         ]
         self.test_tx_hashes = [

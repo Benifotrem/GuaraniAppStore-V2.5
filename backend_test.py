@@ -30,6 +30,19 @@ class GuaraniBackendTester:
         self.test_symbols = ['BTC', 'ETH', 'SOL', 'ADA', 'DOT']
         self.generated_signals = []
         
+        # CryptoShield test data
+        self.test_wallets = [
+            '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',  # Vitalik Buterin
+            '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',   # Binance Hot Wallet
+            '0x0000000000000000000000000000000000000000'    # Null address
+        ]
+        self.test_tx_hashes = [
+            '0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060',  # First TX
+            '0x0000000000000000000000000000000000000000000000000000000000000000'   # Invalid
+        ]
+        self.test_contract = '0xdAC17F958D2ee523a2206206994597C13D831ec7'  # USDT contract
+        self.cryptoshield_scans = []
+        
         # Expected services count
         self.expected_services_count = 14  # Updated for Momentum Predictor services
         

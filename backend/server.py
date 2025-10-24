@@ -3001,6 +3001,17 @@ except Exception as e:
     logger.warning(f"⚠️ Momentum Predictor IA endpoints not loaded: {e}")
 
 
+# ============================================
+# CRYPTOSHIELD IA ENDPOINTS
+# ============================================
+try:
+    from cryptoshield_api import router as cryptoshield_router
+    app.include_router(cryptoshield_router)
+    logger.info("✅ CryptoShield IA endpoints loaded")
+except Exception as e:
+    logger.warning(f"⚠️ CryptoShield IA endpoints not loaded: {e}")
+
+
 # Include router in app
 app.include_router(api_router)
 

@@ -344,11 +344,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Sistema de Autenticación Frontend para Admin Panel"
-  stuck_tasks:
-    - "Blog Admin Panel - Página Principal"
-    - "Formulario de Generación de Artículos"
-    - "Blog API Utils"
+    - "Momentum Predictor IA - Fase 1: Integración"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

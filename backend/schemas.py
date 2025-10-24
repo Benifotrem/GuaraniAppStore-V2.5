@@ -50,7 +50,14 @@ class ServiceCreate(BaseModel):
     short_description: Optional[str] = None
     price_monthly: float
     price_annual: Optional[float] = None
+    price_annual_crypto: Optional[float] = None
+    price_crypto: Optional[float] = None
     currency: str = 'USD'
+    billing_type: Optional[str] = 'subscription'  # one_time, subscription, freemium_packs
+    no_expiration: Optional[bool] = False
+    requires_messaging: Optional[bool] = False
+    multi_purchase: Optional[bool] = False
+    packs: Optional[List[dict]] = None
     status: ServiceStatus = ServiceStatus.COMING_SOON
     icon: Optional[str] = None
     features: Optional[List[str]] = None
@@ -68,7 +75,14 @@ class ServiceResponse(BaseModel):
     short_description: Optional[str] = None
     price_monthly: float
     price_annual: Optional[float] = None
+    price_annual_crypto: Optional[float] = None
+    price_crypto: Optional[float] = None
     currency: str
+    billing_type: Optional[str] = 'subscription'
+    no_expiration: Optional[bool] = False
+    requires_messaging: Optional[bool] = False
+    multi_purchase: Optional[bool] = False
+    packs: Optional[List[dict]] = None
     status: ServiceStatus
     icon: Optional[str] = None
     features: Optional[List[str]] = None

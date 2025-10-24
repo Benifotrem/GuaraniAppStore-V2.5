@@ -77,12 +77,19 @@ class ServiceResponse(BaseModel):
     price_annual: Optional[float] = None
     price_annual_crypto: Optional[float] = None
     price_crypto: Optional[float] = None
+    price_monthly_telegram: Optional[float] = None
+    price_annual_telegram: Optional[float] = None
+    price_annual_crypto_telegram: Optional[float] = None
     currency: str
     billing_type: Optional[str] = 'subscription'
+    billing_period: Optional[str] = None
     no_expiration: Optional[bool] = False
     requires_messaging: Optional[bool] = False
+    platform: Optional[str] = None
+    telegram_discount: Optional[int] = None
     multi_purchase: Optional[bool] = False
     packs: Optional[List[dict]] = None
+    included_services: Optional[List[dict]] = None
     status: ServiceStatus
     icon: Optional[str] = None
     features: Optional[List[str]] = None

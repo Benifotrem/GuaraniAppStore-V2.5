@@ -4,12 +4,16 @@ Señales de trading con LSTM
 """
 import os
 import asyncio
+from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from telegram.constants import ParseMode
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from momentum_service import MomentumPredictorService
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Configuración
 BOT_TOKEN = os.environ.get('MOMENTUM_BOT_TOKEN', os.environ.get('TELEGRAM_BOT_TOKEN'))

@@ -471,7 +471,6 @@ const LandingPage = ({ services }) => {
                       </>
                     )}
                   </div>
-                  </div>
                   
                   {/* Features */}
                   {service.features && service.features.length > 0 && (

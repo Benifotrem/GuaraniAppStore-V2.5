@@ -329,11 +329,221 @@ class GuaraniBackendTester:
         else:
             self.log_test("Invalid Bot Name", False, f"Expected 400, got {status_code}", data)
 
+    def test_momentum_health_check(self):
+        """Test Momentum Predictor health check endpoint"""
+        success, data, status_code = self.make_request('GET', '/momentum/health')
+        
+        if success and isinstance(data, dict):
+            expected_fields = ['status', 'service', 'version', 'model_loaded', 'mode']
+            missing_fields = [field for field in expected_fields if field not in data]
+            
+            if not missing_fields:
+                status = data.get('status')
+                service = data.get('service')
+                version = data.get('version')
+                model_loaded = data.get('model_loaded')
+                mode = data.get('mode')
+                
+                if (status == 'healthy' and 
+                    service == 'Momentum Predictor' and 
+                    version == '1.0.0' and 
+                    model_loaded == False and 
+                    mode == 'MOCK'):
+                    self.log_test("Momentum Health Check", True, 
+                                f"Status: {status}, Service: {service}, Version: {version}, Mode: {mode}")
+                else:
+                    self.log_test("Momentum Health Check", False, 
+                                f"Unexpected values - Status: {status}, Mode: {mode}, Model loaded: {model_loaded}")
+            else:
+                self.log_test("Momentum Health Check", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test("Momentum Health Check", False, f"Status code: {status_code}", data)
+
+    def test_momentum_signal_generation(self, symbol: str):
+        """Test signal generation for a specific symbol"""
+        success, data, status_code = self.make_request('GET', f'/momentum/signal/{symbol}')
+        
+        if success and isinstance(data, dict):
+            # Check required fields
+            required_fields = [
+                'symbol', 'signal', 'confidence', 'current_price', 'entry_price',
+                'target_1', 'target_2', 'stop_loss', 'timeframe', 'risk_level',
+                'probabilities', 'predicted_at', 'model_version', 'is_mock'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                # Validate signal values
+                signal = data.get('signal')
+                confidence = data.get('confidence')
+                current_price = data.get('current_price')
+                is_mock = data.get('is_mock')
+                probabilities = data.get('probabilities', {})
+                predicted_at = data.get('predicted_at')
+                
+                # Validation checks
+                valid_signal = signal in ['BUY', 'SELL', 'HOLD']
+                valid_confidence = isinstance(confidence, (int, float)) and 0 <= confidence <= 100
+                valid_price = isinstance(current_price, (int, float)) and current_price > 0
+                valid_mock = is_mock == True  # Should be True in MOCK mode
+                valid_probabilities = (isinstance(probabilities, dict) and 
+                                     'BUY' in probabilities and 'SELL' in probabilities and 'HOLD' in probabilities)
+                
+                # Check date format (ISO 8601 with UTC)
+                valid_date = False
+                try:
+                    from datetime import datetime
+                    datetime.fromisoformat(predicted_at.replace('Z', '+00:00'))
+                    valid_date = True
+                except:
+                    pass
+                
+                if all([valid_signal, valid_confidence, valid_price, valid_mock, valid_probabilities, valid_date]):
+                    # Store for history testing
+                    self.generated_signals.append(data)
+                    
+                    # Check if price is realistic (> $1 for major cryptos)
+                    price_realistic = current_price > 1 if symbol in ['BTC', 'ETH'] else current_price > 0
+                    
+                    if price_realistic:
+                        self.log_test(f"Momentum Signal {symbol}", True, 
+                                    f"Signal: {signal} ({confidence}% confidence), Price: ${current_price:,.2f}, Mock: {is_mock}")
+                    else:
+                        self.log_test(f"Momentum Signal {symbol}", False, 
+                                    f"Unrealistic price: ${current_price} for {symbol}")
+                else:
+                    validation_errors = []
+                    if not valid_signal: validation_errors.append(f"Invalid signal: {signal}")
+                    if not valid_confidence: validation_errors.append(f"Invalid confidence: {confidence}")
+                    if not valid_price: validation_errors.append(f"Invalid price: {current_price}")
+                    if not valid_mock: validation_errors.append(f"Expected is_mock=True, got {is_mock}")
+                    if not valid_probabilities: validation_errors.append("Invalid probabilities structure")
+                    if not valid_date: validation_errors.append(f"Invalid date format: {predicted_at}")
+                    
+                    self.log_test(f"Momentum Signal {symbol}", False, "; ".join(validation_errors))
+            else:
+                self.log_test(f"Momentum Signal {symbol}", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test(f"Momentum Signal {symbol}", False, f"Status code: {status_code}", data)
+
+    def test_momentum_signals_history(self):
+        """Test signals history endpoint"""
+        # Test general history
+        success, data, status_code = self.make_request('GET', '/momentum/signals/history?limit=10')
+        
+        if success and isinstance(data, list):
+            if len(data) > 0:
+                # Check structure of first signal
+                first_signal = data[0]
+                required_fields = ['symbol', 'signal', 'confidence', 'current_price', 'predicted_at']
+                missing_fields = [field for field in required_fields if field not in first_signal]
+                
+                if not missing_fields:
+                    self.log_test("Momentum Signals History", True, 
+                                f"Retrieved {len(data)} historical signals")
+                else:
+                    self.log_test("Momentum Signals History", False, 
+                                f"History signals missing fields: {missing_fields}")
+            else:
+                self.log_test("Momentum Signals History", True, "No historical signals yet (expected for new system)")
+        else:
+            self.log_test("Momentum Signals History", False, f"Status code: {status_code}", data)
+        
+        # Test filtered history (if we have generated signals)
+        if self.generated_signals:
+            symbol = self.generated_signals[0]['symbol']
+            success, data, status_code = self.make_request('GET', f'/momentum/signals/history?symbol={symbol}&limit=5')
+            
+            if success and isinstance(data, list):
+                self.log_test("Momentum Signals History (Filtered)", True, 
+                            f"Retrieved {len(data)} signals for {symbol}")
+            else:
+                self.log_test("Momentum Signals History (Filtered)", False, 
+                            f"Status code: {status_code}", data)
+
+    def test_momentum_stats(self, symbol: str):
+        """Test momentum stats for a symbol"""
+        success, data, status_code = self.make_request('GET', f'/momentum/stats/{symbol}')
+        
+        if status_code == 404:
+            # Expected if no signals exist yet
+            self.log_test(f"Momentum Stats {symbol}", True, 
+                        "404 Not Found - No signals yet (expected for new system)")
+            return
+        
+        if success and isinstance(data, dict):
+            required_fields = [
+                'symbol', 'total_predictions', 'buy_signals', 'sell_signals', 
+                'hold_signals', 'buy_percentage', 'last_signal', 'last_confidence', 
+                'last_predicted_at'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                total = data.get('total_predictions', 0)
+                buy_signals = data.get('buy_signals', 0)
+                sell_signals = data.get('sell_signals', 0)
+                hold_signals = data.get('hold_signals', 0)
+                buy_percentage = data.get('buy_percentage', 0)
+                
+                # Validate calculations
+                calculated_total = buy_signals + sell_signals + hold_signals
+                calculated_percentage = (buy_signals / total * 100) if total > 0 else 0
+                
+                if calculated_total == total and abs(calculated_percentage - buy_percentage) < 0.1:
+                    self.log_test(f"Momentum Stats {symbol}", True, 
+                                f"Total: {total}, BUY: {buy_signals} ({buy_percentage}%), SELL: {sell_signals}, HOLD: {hold_signals}")
+                else:
+                    self.log_test(f"Momentum Stats {symbol}", False, 
+                                f"Calculation mismatch - Expected total: {calculated_total}, got: {total}")
+            else:
+                self.log_test(f"Momentum Stats {symbol}", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test(f"Momentum Stats {symbol}", False, f"Status code: {status_code}", data)
+
+    def test_momentum_stats_nonexistent_symbol(self):
+        """Test stats endpoint with non-existent symbol"""
+        success, data, status_code = self.make_request('GET', '/momentum/stats/NONEXISTENT')
+        
+        if status_code == 404:
+            self.log_test("Momentum Stats (Non-existent)", True, 
+                        "Correctly returned 404 for non-existent symbol")
+        else:
+            self.log_test("Momentum Stats (Non-existent)", False, 
+                        f"Expected 404, got {status_code}", data)
+
+    def verify_trading_levels_calculation(self, signal_data):
+        """Verify that trading levels are reasonable"""
+        current_price = signal_data.get('current_price')
+        entry_price = signal_data.get('entry_price')
+        target_1 = signal_data.get('target_1')
+        target_2 = signal_data.get('target_2')
+        stop_loss = signal_data.get('stop_loss')
+        signal = signal_data.get('signal')
+        
+        if signal == 'BUY':
+            # For BUY: entry < current, targets > current, stop_loss < current
+            valid_entry = entry_price < current_price
+            valid_targets = target_1 > current_price and target_2 > target_1
+            valid_stop = stop_loss < current_price
+        elif signal == 'SELL':
+            # For SELL: entry > current, targets < current, stop_loss > current
+            valid_entry = entry_price > current_price
+            valid_targets = target_1 < current_price and target_2 < target_1
+            valid_stop = stop_loss > current_price
+        else:  # HOLD
+            # For HOLD: levels should be close to current price
+            valid_entry = abs(entry_price - current_price) / current_price < 0.02
+            valid_targets = target_1 > current_price and target_2 > target_1
+            valid_stop = stop_loss < current_price
+        
+        return all([valid_entry, valid_targets, valid_stop])
+
     def run_all_tests(self):
-        """Run all backend tests focusing on 502 error fix"""
+        """Run all backend tests focusing on Momentum Predictor IA"""
         print("=" * 70)
         print("GuaraniAppStore V2.5 Pro Backend Testing Suite")
-        print("Focus: 502 Bad Gateway Fix - /api/services and /api/countries")
+        print("Focus: MOMENTUM PREDICTOR IA - FASE 1 INTEGRACIÓN")
         print("=" * 70)
         print()
         
@@ -354,6 +564,32 @@ class GuaraniBackendTester:
         # Admin functionality (if endpoints work)
         print("👤 Testing Admin Access...")
         self.test_admin_login()
+        
+        # MOMENTUM PREDICTOR IA TESTING
+        print("🎯 Testing Momentum Predictor IA - Fase 1...")
+        
+        # 1. Health Check
+        print("   📊 Health Check...")
+        self.test_momentum_health_check()
+        
+        # 2. Signal Generation for multiple symbols
+        print("   🔮 Signal Generation...")
+        for symbol in self.test_symbols:
+            self.test_momentum_signal_generation(symbol)
+            time.sleep(1)  # Small delay between requests
+        
+        # 3. Signals History
+        print("   📈 Signals History...")
+        self.test_momentum_signals_history()
+        
+        # 4. Stats for symbols (after generating signals)
+        print("   📊 Symbol Statistics...")
+        for symbol in self.test_symbols:
+            self.test_momentum_stats(symbol)
+        
+        # 5. Error handling
+        print("   ❌ Error Handling...")
+        self.test_momentum_stats_nonexistent_symbol()
         
         # Summary
         self.print_summary()

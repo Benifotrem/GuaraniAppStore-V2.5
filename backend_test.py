@@ -773,15 +773,15 @@ class GuaraniBackendTester:
         print("👤 Testing Admin Access...")
         self.test_admin_login()
         
-        # MOMENTUM PREDICTOR IA TESTING
-        print("🎯 Testing Momentum Predictor IA - Fase 1...")
+        # MOMENTUM PREDICTOR IA TESTING - FASE 2
+        print("🎯 Testing Momentum Predictor IA - Fase 2 (Technical Analysis Complete)...")
         
         # 1. Health Check
         print("   📊 Health Check...")
         self.test_momentum_health_check()
         
-        # 2. Signal Generation for multiple symbols
-        print("   🔮 Signal Generation...")
+        # 2. Signal Generation for multiple symbols (5 symbols for better variety testing)
+        print("   🔮 Signal Generation with Technical Analysis...")
         for symbol in self.test_symbols:
             self.test_momentum_signal_generation(symbol)
             time.sleep(1)  # Small delay between requests
@@ -798,6 +798,13 @@ class GuaraniBackendTester:
         # 5. Error handling
         print("   ❌ Error Handling...")
         self.test_momentum_stats_nonexistent_symbol()
+        
+        # 6. FASE 2 SPECIFIC TESTS
+        print("   🧮 Fase 2 Specific Validations...")
+        self.test_signal_variety_across_symbols()
+        self.test_confidence_variation()
+        self.test_scoring_system_logic()
+        self.test_technical_indicators_realism()
         
         # Summary
         self.print_summary()

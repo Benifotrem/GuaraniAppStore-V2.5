@@ -344,7 +344,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Momentum Predictor IA - Fase 1: Integración"
+    - "Momentum Predictor IA - Fase 2: Lógica Completa"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -363,15 +363,15 @@ class GuaraniBackendTester:
             self.log_test("Momentum Health Check", False, f"Status code: {status_code}", data)
 
     def test_momentum_signal_generation(self, symbol: str):
-        """Test signal generation for a specific symbol"""
+        """Test signal generation for a specific symbol - FASE 2 with Technical Analysis"""
         success, data, status_code = self.make_request('GET', f'/momentum/signal/{symbol}')
         
         if success and isinstance(data, dict):
-            # Check required fields
+            # Check required fields (including new 'indicators' field for Fase 2)
             required_fields = [
                 'symbol', 'signal', 'confidence', 'current_price', 'entry_price',
                 'target_1', 'target_2', 'stop_loss', 'timeframe', 'risk_level',
-                'probabilities', 'predicted_at', 'model_version', 'is_mock'
+                'probabilities', 'predicted_at', 'model_version', 'is_mock', 'indicators'
             ]
             missing_fields = [field for field in required_fields if field not in data]
             
@@ -383,8 +383,53 @@ class GuaraniBackendTester:
                 is_mock = data.get('is_mock')
                 probabilities = data.get('probabilities', {})
                 predicted_at = data.get('predicted_at')
+                model_version = data.get('model_version')
+                indicators = data.get('indicators', {})
                 
-                # Validation checks
+                # FASE 2 SPECIFIC VALIDATIONS
+                # 1. Check model version is updated
+                valid_model_version = model_version == "MOCK_v2_Technical_Analysis"
+                
+                # 2. Check indicators field contains required technical indicators
+                required_indicators = ['rsi', 'macd', 'sma_7', 'sma_25', 'stoch_k', 'buy_score', 'sell_score']
+                missing_indicators = [ind for ind in required_indicators if ind not in indicators]
+                valid_indicators = len(missing_indicators) == 0
+                
+                # 3. Validate indicator values are realistic numbers
+                valid_indicator_values = True
+                if valid_indicators:
+                    rsi = indicators.get('rsi', 0)
+                    macd = indicators.get('macd', 0)
+                    buy_score = indicators.get('buy_score', 0)
+                    sell_score = indicators.get('sell_score', 0)
+                    
+                    # RSI should be between 0-100
+                    if not (0 <= rsi <= 100):
+                        valid_indicator_values = False
+                    
+                    # Scores should be integers between 0-8
+                    if not (isinstance(buy_score, int) and 0 <= buy_score <= 8):
+                        valid_indicator_values = False
+                    if not (isinstance(sell_score, int) and 0 <= sell_score <= 8):
+                        valid_indicator_values = False
+                
+                # 4. Validate signal logic consistency with scores
+                valid_signal_logic = True
+                if valid_indicators:
+                    buy_score = indicators.get('buy_score', 0)
+                    sell_score = indicators.get('sell_score', 0)
+                    
+                    if signal == 'BUY' and buy_score < sell_score + 2:
+                        valid_signal_logic = False
+                    elif signal == 'SELL' and sell_score < buy_score + 2:
+                        valid_signal_logic = False
+                    elif signal == 'HOLD' and abs(buy_score - sell_score) >= 2:
+                        valid_signal_logic = False
+                
+                # 5. Check confidence varies (not always 60%)
+                confidence_varies = confidence != 60.0
+                
+                # Original validations
                 valid_signal = signal in ['BUY', 'SELL', 'HOLD']
                 valid_confidence = isinstance(confidence, (int, float)) and 0 <= confidence <= 100
                 valid_price = isinstance(current_price, (int, float)) and current_price > 0
@@ -401,27 +446,41 @@ class GuaraniBackendTester:
                 except:
                     pass
                 
-                if all([valid_signal, valid_confidence, valid_price, valid_mock, valid_probabilities, valid_date]):
+                # Check if price is realistic (> $1 for major cryptos)
+                price_realistic = current_price > 1 if symbol in ['BTC', 'ETH'] else current_price > 0
+                
+                # All validations must pass
+                all_valid = all([
+                    valid_signal, valid_confidence, valid_price, valid_mock, valid_probabilities, 
+                    valid_date, valid_model_version, valid_indicators, valid_indicator_values,
+                    valid_signal_logic, price_realistic
+                ])
+                
+                if all_valid:
                     # Store for history testing
                     self.generated_signals.append(data)
                     
-                    # Check if price is realistic (> $1 for major cryptos)
-                    price_realistic = current_price > 1 if symbol in ['BTC', 'ETH'] else current_price > 0
+                    # Enhanced success message with Fase 2 details
+                    buy_score = indicators.get('buy_score', 0)
+                    sell_score = indicators.get('sell_score', 0)
+                    rsi = indicators.get('rsi', 0)
                     
-                    if price_realistic:
-                        self.log_test(f"Momentum Signal {symbol}", True, 
-                                    f"Signal: {signal} ({confidence}% confidence), Price: ${current_price:,.2f}, Mock: {is_mock}")
-                    else:
-                        self.log_test(f"Momentum Signal {symbol}", False, 
-                                    f"Unrealistic price: ${current_price} for {symbol}")
+                    self.log_test(f"Momentum Signal {symbol}", True, 
+                                f"Signal: {signal} ({confidence}% confidence), Price: ${current_price:,.2f}, "
+                                f"RSI: {rsi:.1f}, Scores: BUY={buy_score} SELL={sell_score}, Model: {model_version}")
                 else:
                     validation_errors = []
                     if not valid_signal: validation_errors.append(f"Invalid signal: {signal}")
                     if not valid_confidence: validation_errors.append(f"Invalid confidence: {confidence}")
-                    if not valid_price: validation_errors.append(f"Invalid price: {current_price}")
+                    if not valid_price: validation_errors.append(f"Invalid price: ${current_price}")
+                    if not price_realistic: validation_errors.append(f"Unrealistic price: ${current_price} for {symbol}")
                     if not valid_mock: validation_errors.append(f"Expected is_mock=True, got {is_mock}")
                     if not valid_probabilities: validation_errors.append("Invalid probabilities structure")
                     if not valid_date: validation_errors.append(f"Invalid date format: {predicted_at}")
+                    if not valid_model_version: validation_errors.append(f"Expected model_version='MOCK_v2_Technical_Analysis', got '{model_version}'")
+                    if not valid_indicators: validation_errors.append(f"Missing indicators: {missing_indicators}")
+                    if not valid_indicator_values: validation_errors.append("Invalid indicator values (RSI not 0-100 or scores not 0-8)")
+                    if not valid_signal_logic: validation_errors.append(f"Signal logic inconsistent: {signal} with BUY={buy_score} SELL={sell_score}")
                     
                     self.log_test(f"Momentum Signal {symbol}", False, "; ".join(validation_errors))
             else:

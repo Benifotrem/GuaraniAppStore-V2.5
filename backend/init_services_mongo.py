@@ -229,6 +229,82 @@ async def init_services():
                 "Asistente GuaraniAppStore",
                 "Rocío Almeida - Consultor comercial"
             ]
+        },
+        {
+            "name": "Automatización y Gestión de E-commerce",
+            "slug": "automatizacion-ecommerce",
+            "category": "E-commerce",
+            "description": "Gestión automatizada completa para tu tienda online con IA",
+            "short_description": "Automatiza tu tienda online",
+            "price": 350000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 15,
+            "active": False,
+            "status": "coming_soon",
+            "features": [
+                "Gestión de inventario automática",
+                "Respuestas a clientes con IA",
+                "Análisis de ventas",
+                "Recomendaciones de productos"
+            ]
+        },
+        {
+            "name": "Automatización de Contenidos en redes sociales",
+            "slug": "automatizacion-redes-sociales",
+            "category": "Marketing",
+            "description": "Crea y programa contenido automáticamente para tus redes sociales",
+            "short_description": "Contenido automático para redes",
+            "price": 250000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 16,
+            "active": False,
+            "status": "coming_soon",
+            "features": [
+                "Generación de posts con IA",
+                "Programación automática",
+                "Análisis de engagement",
+                "Optimización de hashtags"
+            ]
+        },
+        {
+            "name": "Generador de Blogs Automatizado y SEO",
+            "slug": "generador-blogs-seo",
+            "category": "Marketing",
+            "description": "Genera artículos SEO optimizados automáticamente para tu blog",
+            "short_description": "Blogs SEO con IA",
+            "price": 280000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 17,
+            "active": False,
+            "status": "coming_soon",
+            "features": [
+                "Artículos optimizados SEO",
+                "Publicación automática",
+                "Investigación de keywords",
+                "Meta descriptions"
+            ]
+        },
+        {
+            "name": "Agente de Ventas IA",
+            "slug": "agente-ventas-ia",
+            "category": "Ventas",
+            "description": "Agente de ventas con IA que contacta y cierra clientes automáticamente",
+            "short_description": "Ventas automatizadas con IA",
+            "price": 450000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 18,
+            "active": False,
+            "status": "coming_soon",
+            "features": [
+                "Contacto automático de leads",
+                "Seguimiento inteligente",
+                "Cierre de ventas con IA",
+                "Integración CRM"
+            ]
         }
     ]
     

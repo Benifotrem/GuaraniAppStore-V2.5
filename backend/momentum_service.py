@@ -42,8 +42,8 @@ class MomentumPredictorService:
             print("   Para entrenar el modelo, ejecuta: python train_momentum_model.py")
             self.use_mock = True
         
-        # Exchange para obtener datos
-        self.exchange = ccxt.binance()
+        # Exchange para obtener datos (usando Kraken - sin restricciones)
+        self.exchange = ccxt.kraken()
     
     def fetch_recent_data(self, symbol, days=60):
         """

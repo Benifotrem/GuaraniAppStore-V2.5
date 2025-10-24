@@ -832,6 +832,12 @@ class GuaraniBackendTester:
         momentum_history = any(r['success'] and r['test'] == 'Momentum Signals History' for r in self.test_results)
         momentum_stats = any(r['success'] and 'Momentum Stats' in r['test'] for r in self.test_results)
         
+        # Check Fase 2 specific features
+        signal_variety = any(r['success'] and r['test'] == 'Signal Variety' for r in self.test_results)
+        confidence_variation = any(r['success'] and r['test'] == 'Confidence Variation' for r in self.test_results)
+        scoring_logic = any(r['success'] and r['test'] == 'Scoring System Logic' for r in self.test_results)
+        indicators_realism = any(r['success'] and r['test'] == 'Technical Indicators Realism' for r in self.test_results)
+        
         # Check core endpoints
         countries_success = any(r['success'] and r['test'] == 'Countries Endpoint' for r in self.test_results)
         services_success = any(r['success'] and r['test'] == 'Services Endpoint' for r in self.test_results)

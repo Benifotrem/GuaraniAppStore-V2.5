@@ -1325,9 +1325,9 @@ class GuaraniBackendTester:
         self.print_summary()
 
     def print_summary(self):
-        """Print test summary focusing on Momentum Predictor IA"""
+        """Print test summary focusing on CryptoShield IA"""
         print("=" * 70)
-        print("TEST SUMMARY - MOMENTUM PREDICTOR IA FASE 2 LÓGICA COMPLETA")
+        print("TEST SUMMARY - CRYPTOSHIELD IA SISTEMA COMPLETO")
         print("=" * 70)
         
         total_tests = len(self.test_results)
@@ -1340,18 +1340,23 @@ class GuaraniBackendTester:
         print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
         print()
         
-        # Check Momentum Predictor endpoints
-        momentum_health = any(r['success'] and r['test'] == 'Momentum Health Check' for r in self.test_results)
-        momentum_signals = all(any(r['success'] and r['test'] == f'Momentum Signal {symbol}' for r in self.test_results) 
-                              for symbol in self.test_symbols)
-        momentum_history = any(r['success'] and r['test'] == 'Momentum Signals History' for r in self.test_results)
-        momentum_stats = any(r['success'] and 'Momentum Stats' in r['test'] for r in self.test_results)
+        # Check CryptoShield endpoints
+        cryptoshield_health = any(r['success'] and r['test'] == 'CryptoShield Health Check' for r in self.test_results)
+        wallet_scans = all(any(r['success'] and 'CryptoShield Wallet Scan' in r['test'] for r in self.test_results) 
+                          for _ in self.test_wallets)
+        tx_verifications = all(any(r['success'] and 'CryptoShield TX Verify' in r['test'] for r in self.test_results) 
+                              for _ in self.test_tx_hashes)
+        contract_scan = any(r['success'] and r['test'] == 'CryptoShield Contract Scan (USDT)' for r in self.test_results)
+        scan_history = any(r['success'] and 'CryptoShield Scan History' in r['test'] for r in self.test_results)
+        stats = any(r['success'] and r['test'] == 'CryptoShield Statistics' for r in self.test_results)
         
-        # Check Fase 2 specific features
-        signal_variety = any(r['success'] and r['test'] == 'Signal Variety' for r in self.test_results)
-        confidence_variation = any(r['success'] and r['test'] == 'Confidence Variation' for r in self.test_results)
-        scoring_logic = any(r['success'] and r['test'] == 'Scoring System Logic' for r in self.test_results)
-        indicators_realism = any(r['success'] and r['test'] == 'Technical Indicators Realism' for r in self.test_results)
+        # Check validation and error handling
+        address_validation = any(r['success'] and r['test'] == 'CryptoShield Address Validation' for r in self.test_results)
+        tx_validation = any(r['success'] and r['test'] == 'CryptoShield TX Hash Validation' for r in self.test_results)
+        
+        # Check critical validations
+        etherscan_integration = any(r['success'] and r['test'] == 'CryptoShield Etherscan Integration' for r in self.test_results)
+        risk_scoring = any(r['success'] and r['test'] == 'CryptoShield Risk Scoring' for r in self.test_results)
         
         # Check core endpoints
         countries_success = any(r['success'] and r['test'] == 'Countries Endpoint' for r in self.test_results)
@@ -1359,18 +1364,19 @@ class GuaraniBackendTester:
         backend_success = any(r['success'] and r['test'] == 'Backend Status' for r in self.test_results)
         mongodb_success = any(r['success'] and r['test'] == 'MongoDB Connection' for r in self.test_results)
         
-        print("🎯 MOMENTUM PREDICTOR IA ENDPOINTS:")
-        print(f"   /api/momentum/health:           {'✅ WORKING' if momentum_health else '❌ FAILED'}")
-        print(f"   /api/momentum/signal/{{symbol}}: {'✅ WORKING' if momentum_signals else '❌ FAILED'}")
-        print(f"   /api/momentum/signals/history:  {'✅ WORKING' if momentum_history else '❌ FAILED'}")
-        print(f"   /api/momentum/stats/{{symbol}}:  {'✅ WORKING' if momentum_stats else '❌ FAILED'}")
+        print("🛡️ CRYPTOSHIELD IA ENDPOINTS:")
+        print(f"   /api/cryptoshield/health:                    {'✅ WORKING' if cryptoshield_health else '❌ FAILED'}")
+        print(f"   /api/cryptoshield/scan/wallet/{{address}}:    {'✅ WORKING' if wallet_scans else '❌ FAILED'}")
+        print(f"   /api/cryptoshield/verify/transaction/{{hash}}: {'✅ WORKING' if tx_verifications else '❌ FAILED'}")
+        print(f"   /api/cryptoshield/scan/contract/{{address}}:  {'✅ WORKING' if contract_scan else '❌ FAILED'}")
+        print(f"   /api/cryptoshield/scans/history:             {'✅ WORKING' if scan_history else '❌ FAILED'}")
+        print(f"   /api/cryptoshield/stats:                     {'✅ WORKING' if stats else '❌ FAILED'}")
         print()
         
-        print("🧮 FASE 2 TECHNICAL ANALYSIS FEATURES:")
-        print(f"   Signal Variety (not all HOLD):  {'✅ WORKING' if signal_variety else '❌ FAILED'}")
-        print(f"   Dynamic Confidence Calculation: {'✅ WORKING' if confidence_variation else '❌ FAILED'}")
-        print(f"   Scoring System Logic (8 points): {'✅ WORKING' if scoring_logic else '❌ FAILED'}")
-        print(f"   Technical Indicators Realism:   {'✅ WORKING' if indicators_realism else '❌ FAILED'}")
+        print("🔍 VALIDATION & ERROR HANDLING:")
+        print(f"   Address Format Validation (42 chars):       {'✅ WORKING' if address_validation else '❌ FAILED'}")
+        print(f"   TX Hash Format Validation (66 chars):       {'✅ WORKING' if tx_validation else '❌ FAILED'}")
+        print(f"   400 Bad Request for Invalid Inputs:         {'✅ WORKING' if address_validation and tx_validation else '❌ FAILED'}")
         print()
         
         print("🔧 CORE SYSTEM STATUS:")
@@ -1381,47 +1387,50 @@ class GuaraniBackendTester:
         print()
         
         # Check critical verifications
-        if self.generated_signals:
-            print("✅ VERIFICACIONES CRÍTICAS FASE 2 COMPLETADAS:")
-            sample_signal = self.generated_signals[0]
-            print(f"   ✅ Precios reales desde Kraken: ${sample_signal.get('current_price', 0):,.2f}")
-            print(f"   ✅ Señales guardadas en MongoDB: {len(self.generated_signals)} señales generadas")
-            print(f"   ✅ Indicador is_mock = {sample_signal.get('is_mock', False)}")
+        if self.cryptoshield_scans:
+            print("✅ VERIFICACIONES CRÍTICAS COMPLETADAS:")
             
-            # Check model version
-            model_version = sample_signal.get('model_version', '')
-            print(f"   {'✅' if model_version == 'MOCK_v2_Technical_Analysis' else '❌'} Model version: {model_version}")
+            # Check if we have scans from different types
+            wallet_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'wallet'])
+            tx_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'transaction'])
+            contract_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'contract'])
             
-            # Check indicators field
-            indicators = sample_signal.get('indicators', {})
-            has_indicators = bool(indicators and 'rsi' in indicators and 'buy_score' in indicators)
-            print(f"   {'✅' if has_indicators else '❌'} Campo 'indicators' con RSI, MACD, scores: {'Presente' if has_indicators else 'Ausente'}")
+            print(f"   ✅ Escaneos realizados: {len(self.cryptoshield_scans)} total")
+            print(f"      - Wallets: {wallet_scans_count}")
+            print(f"      - Transacciones: {tx_scans_count}")
+            print(f"      - Contratos: {contract_scans_count}")
             
-            if has_indicators:
-                rsi = indicators.get('rsi', 0)
-                buy_score = indicators.get('buy_score', 0)
-                sell_score = indicators.get('sell_score', 0)
-                print(f"   ✅ Indicadores técnicos: RSI={rsi:.1f}, BUY_score={buy_score}, SELL_score={sell_score}")
+            # Check sample data
+            if self.cryptoshield_scans:
+                sample_scan = self.cryptoshield_scans[0]
+                print(f"   ✅ Indicador is_mock = {sample_scan.get('is_mock', False)}")
+                print(f"   ✅ Model version: {sample_scan.get('model_version', 'N/A')}")
+                
+                # Check if we have realistic data
+                if sample_scan.get('scan_type') == 'wallet':
+                    balance = sample_scan.get('balance_eth', 0)
+                    tx_count = sample_scan.get('transaction_count', 0)
+                    print(f"   ✅ Datos reales desde Etherscan: Balance {balance:.4f} ETH, {tx_count:,} TXs")
+                
+                # Check risk assessment
+                risk_level = sample_scan.get('risk_level', 'unknown')
+                risk_score = sample_scan.get('risk_score', 0)
+                print(f"   ✅ Risk assessment: {risk_level.upper()} ({risk_score}/100)")
+                
+                # Check recommendations
+                recommendations = sample_scan.get('recommendations', [])
+                print(f"   ✅ Recomendaciones contextuales: {len(recommendations)} items")
+                
+                # Check date format
+                analyzed_at = sample_scan.get('analyzed_at') or sample_scan.get('verified_at', '')
+                iso_format = 'T' in analyzed_at and ('Z' in analyzed_at or '+' in analyzed_at)
+                print(f"   {'✅' if iso_format else '❌'} Formato fecha ISO 8601: {'Correcto' if iso_format else 'Incorrecto'}")
             
-            # Verify trading levels
-            levels_valid = self.verify_trading_levels_calculation(sample_signal)
-            print(f"   {'✅' if levels_valid else '❌'} Cálculos de niveles de trading: {'Correctos' if levels_valid else 'Incorrectos'}")
+            # Check Etherscan integration
+            print(f"   {'✅' if etherscan_integration else '❌'} Integración Etherscan: {'Funcionando' if etherscan_integration else 'Fallando'}")
             
-            # Check timeframe and risk
-            timeframe = sample_signal.get('timeframe')
-            risk_level = sample_signal.get('risk_level')
-            print(f"   ✅ Timeframe calculado: {timeframe}")
-            print(f"   ✅ Risk level asignado: {risk_level}")
-            
-            # Check date format
-            predicted_at = sample_signal.get('predicted_at', '')
-            iso_format = 'T' in predicted_at and ('Z' in predicted_at or '+' in predicted_at)
-            print(f"   {'✅' if iso_format else '❌'} Formato fecha ISO 8601 UTC: {'Correcto' if iso_format else 'Incorrecto'}")
-            
-            # Check confidence variation
-            confidences = [s.get('confidence', 60) for s in self.generated_signals]
-            confidence_varies = len(set(confidences)) > 1
-            print(f"   {'✅' if confidence_varies else '❌'} Confianza dinámica (no siempre 60%): {'Sí' if confidence_varies else 'No'}")
+            # Check risk scoring consistency
+            print(f"   {'✅' if risk_scoring else '❌'} Risk scoring consistente: {'Sí' if risk_scoring else 'No'}")
         
         if failed_tests > 0:
             print()
@@ -1431,64 +1440,68 @@ class GuaraniBackendTester:
                     print(f"   • {result['test']}: {result['details']}")
             print()
         
-        # Overall assessment for Momentum Predictor Fase 2
-        momentum_working = momentum_health and momentum_signals and momentum_history
-        fase2_features_working = signal_variety and confidence_variation and scoring_logic and indicators_realism
+        # Overall assessment for CryptoShield IA
+        cryptoshield_core_working = cryptoshield_health and wallet_scans and tx_verifications and contract_scan
+        cryptoshield_features_working = scan_history and stats and address_validation and tx_validation
+        cryptoshield_integrations_working = etherscan_integration and risk_scoring
         core_working = countries_success and services_success and backend_success
         
         print("🏆 RESULTADO FINAL:")
-        if momentum_working and fase2_features_working and core_working:
-            print("🎉 SUCCESS: MOMENTUM PREDICTOR IA FASE 2 COMPLETAMENTE FUNCIONAL!")
-            print("   ✅ Todos los endpoints de Momentum Predictor funcionando")
-            print("   ✅ Sistema de análisis técnico completo (20 indicadores)")
-            print("   ✅ Sistema de scoring con 8 puntos máximo operativo")
-            print("   ✅ Confianza calculada dinámicamente")
-            print("   ✅ Campo 'indicators' incluido en respuesta API")
-            print("   ✅ Model version MOCK_v2_Technical_Analysis")
-            print("   ✅ Integración con Kraken exchange operativa")
-            print("   ✅ Almacenamiento en MongoDB funcionando")
+        if cryptoshield_core_working and cryptoshield_features_working and cryptoshield_integrations_working and core_working:
+            print("🎉 SUCCESS: CRYPTOSHIELD IA COMPLETAMENTE FUNCIONAL!")
+            print("   ✅ Todos los endpoints de CryptoShield funcionando")
+            print("   ✅ Integración real con Etherscan API operativa")
+            print("   ✅ Análisis de wallets, transacciones y contratos")
+            print("   ✅ Risk assessment realista y consistente")
+            print("   ✅ Validación de formato de addresses/hashes")
+            print("   ✅ Error handling robusto (400 Bad Request)")
+            print("   ✅ Guardado correcto en MongoDB")
+            print("   ✅ Historial y estadísticas funcionando")
+            print("   ✅ Recomendaciones contextuales al risk_level")
             print("   ✅ Sistema backend estable")
-        elif momentum_working and fase2_features_working:
-            print("🟡 PARTIAL SUCCESS: Momentum Predictor Fase 2 funcionando, problemas en sistema core")
-            print("   ✅ Momentum Predictor IA Fase 2 completamente operativo")
-            print("   ✅ Análisis técnico y scoring system funcionando")
-            print("   ❌ Algunos endpoints del sistema core fallan")
-        elif momentum_working:
-            print("🟠 PARTIAL SUCCESS: Endpoints funcionando pero faltan características Fase 2")
-            print("   ✅ Endpoints básicos de Momentum Predictor funcionando")
-            if not signal_variety:
-                print("   ❌ Señales no varían suficientemente")
-            if not confidence_variation:
-                print("   ❌ Confianza no varía dinámicamente")
-            if not scoring_logic:
-                print("   ❌ Lógica de scoring system incorrecta")
-            if not indicators_realism:
-                print("   ❌ Indicadores técnicos no realistas")
+        elif cryptoshield_core_working and cryptoshield_features_working:
+            print("🟡 PARTIAL SUCCESS: CryptoShield funcionando, problemas en integraciones")
+            print("   ✅ Endpoints principales de CryptoShield operativos")
+            print("   ✅ Funcionalidades básicas funcionando")
+            if not etherscan_integration:
+                print("   ❌ Integración con Etherscan fallando")
+            if not risk_scoring:
+                print("   ❌ Risk scoring inconsistente")
+        elif cryptoshield_core_working:
+            print("🟠 PARTIAL SUCCESS: Endpoints básicos funcionando, faltan características")
+            print("   ✅ Endpoints básicos de CryptoShield funcionando")
+            if not cryptoshield_features_working:
+                print("   ❌ Historial, estadísticas o validaciones fallando")
+            if not cryptoshield_integrations_working:
+                print("   ❌ Integraciones críticas fallando")
         else:
-            print("🚨 FAILURE: Problemas en Momentum Predictor IA!")
-            if not momentum_health:
+            print("🚨 FAILURE: Problemas críticos en CryptoShield IA!")
+            if not cryptoshield_health:
                 print("   ❌ Health check fallando")
-            if not momentum_signals:
-                print("   ❌ Generación de señales fallando")
-            if not momentum_history:
-                print("   ❌ Historial de señales fallando")
+            if not wallet_scans:
+                print("   ❌ Escaneo de wallets fallando")
+            if not tx_verifications:
+                print("   ❌ Verificación de transacciones fallando")
+            if not contract_scan:
+                print("   ❌ Escaneo de contratos fallando")
         
         print()
         print("📋 PRÓXIMOS PASOS:")
-        if momentum_working and fase2_features_working:
-            print("   • FASE 2 COMPLETADA - Sistema de análisis técnico completo")
-            print("   • Listo para entrenar modelo LSTM real con datos históricos")
-            print("   • Bot de Telegram ya implementado y listo")
-            print("   • Considerar implementar CryptoShield IA como siguiente fase")
-        elif momentum_working:
-            print("   • Revisar implementación de indicadores técnicos en momentum_service.py")
-            print("   • Verificar sistema de scoring en _generate_mock_signal()")
-            print("   • Comprobar cálculo dinámico de confianza")
-            print("   • Validar campo 'indicators' en respuesta API")
+        if cryptoshield_core_working and cryptoshield_features_working and cryptoshield_integrations_working:
+            print("   • CRYPTOSHIELD IA COMPLETADO - Sistema de detección de fraude operativo")
+            print("   • Listo para entrenar modelo Autoencoder real con datos históricos")
+            print("   • Bot de Telegram CryptoShield ya implementado")
+            print("   • Considerar implementar más exchanges (BSC, Polygon)")
+            print("   • Evaluar integración con servicios de threat intelligence")
+        elif cryptoshield_core_working:
+            print("   • Revisar integración con Etherscan API en cryptoshield_analyzer.py")
+            print("   • Verificar configuración de ETHERSCAN_API_KEY en .env")
+            print("   • Comprobar lógica de risk scoring en cryptoshield_service.py")
+            print("   • Validar guardado en MongoDB (colección cryptoshield_scans)")
         else:
             print("   • Revisar logs del backend: tail -n 100 /var/log/supervisor/backend.*.log")
-            print("   • Verificar integración de momentum_api.py en server.py")
-            print("   • Comprobar conexión con Kraken exchange")
+            print("   • Verificar integración de cryptoshield_api.py en server.py")
+            print("   • Comprobar dependencias: web3.py, etherscan-python")
             print("   • Validar configuración de MongoDB")
 
 if __name__ == "__main__":

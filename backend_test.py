@@ -26,8 +26,8 @@ class GuaraniBackendTester:
         self.test_article_slug = None
         self.initial_views = 0
         
-        # Momentum Predictor test data - FASE 2 with more symbols
-        self.test_symbols = ['BTC', 'ETH', 'SOL', 'ADA', 'MATIC']
+        # Momentum Predictor test data - FASE 2 with more symbols (using Kraken-supported pairs)
+        self.test_symbols = ['BTC', 'ETH', 'SOL', 'ADA', 'DOT']
         self.generated_signals = []
         
         # Expected services count

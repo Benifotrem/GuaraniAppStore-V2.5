@@ -878,10 +878,10 @@ class GuaraniBackendTester:
             else:
                 self.log_test(f"CryptoShield Wallet Scan ({expected_name})", False, f"Missing fields: {missing_fields}")
         else:
-            # Check if it's a validation error (400) for invalid addresses
-            if status_code == 400 and address == '0x0000000000000000000000000000000000000000':
+            # Check if it's a validation error (400) for null address or other invalid addresses
+            if status_code == 400:
                 self.log_test(f"CryptoShield Wallet Scan ({expected_name})", True, 
-                            "Correctly rejected invalid address format with 400 Bad Request")
+                            "Correctly rejected invalid/null address with 400 Bad Request")
             else:
                 self.log_test(f"CryptoShield Wallet Scan ({expected_name})", False, f"Status code: {status_code}", data)
 

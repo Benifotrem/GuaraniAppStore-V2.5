@@ -152,55 +152,189 @@ class MomentumPredictorService:
         """
         Generar señal MOCK para testing (sin modelo entrenado)
         
-        Usa indicadores técnicos básicos para simular una señal
+        Usa indicadores técnicos completos para simular una señal más realista
         """
-        print("⚠️ Generando señal MOCK (modelo no entrenado)")
+        print("⚠️ Generando señal MOCK con indicadores técnicos completos")
         
-        # Calcular indicadores básicos
-        close = df['close'].iloc[-20:]  # Últimos 20 días
-        sma_7 = close.rolling(7).mean().iloc[-1]
-        sma_25 = close.rolling(25).mean().iloc[-1] if len(close) >= 25 else close.mean()
-        
-        # Lógica simple: si precio > SMA7 > SMA25 → BUY
-        if current_price > sma_7 > sma_25:
-            signal = 'BUY'
-            probabilities = [0.15, 0.20, 0.65]  # SELL, HOLD, BUY
-        elif current_price < sma_7 < sma_25:
-            signal = 'SELL'
-            probabilities = [0.65, 0.20, 0.15]
-        else:
-            signal = 'HOLD'
-            probabilities = [0.20, 0.60, 0.20]
-        
-        confidence = max(probabilities) * 100
-        
-        # Calcular niveles
-        levels = self._calculate_trading_levels(signal, current_price, confidence)
-        
-        return {
-            'symbol': symbol,
-            'signal': signal,
-            'confidence': round(confidence, 2),
+        try:
+            # Calcular todos los indicadores técnicos usando el preprocessor
+            df_with_indicators = self.preprocessor.calculate_indicators(df)
             
-            'current_price': round(current_price, 2),
-            'entry_price': levels['entry'],
-            'target_1': levels['target_1'],
-            'target_2': levels['target_2'],
-            'stop_loss': levels['stop_loss'],
+            # Obtener valores actuales de los indicadores
+            last_row = df_with_indicators.iloc[-1]
             
-            'timeframe': self._calculate_timeframe(confidence),
-            'risk_level': self._calculate_risk(signal, confidence),
+            rsi = last_row['rsi_14']
+            macd = last_row['macd']
+            macd_signal = last_row['macd_signal']
+            sma_7 = last_row['sma_7']
+            sma_25 = last_row['sma_25']
+            bb_upper = last_row['bb_upper']
+            bb_lower = last_row['bb_lower']
+            stoch_k = last_row['stochastic_k']
             
-            'probabilities': {
-                'SELL': round(probabilities[0] * 100, 2),
-                'HOLD': round(probabilities[1] * 100, 2),
-                'BUY': round(probabilities[2] * 100, 2)
-            },
+            # Sistema de puntos para determinar señal
+            buy_score = 0
+            sell_score = 0
             
-            'predicted_at': datetime.now(timezone.utc).isoformat(),
-            'model_version': 'MOCK',
-            'is_mock': True
-        }
+            # 1. RSI Analysis (peso: 2 puntos)
+            if rsi < 30:  # Oversold
+                buy_score += 2
+            elif rsi > 70:  # Overbought
+                sell_score += 2
+            elif 45 <= rsi <= 55:  # Neutral
+                pass
+            elif rsi < 45:
+                buy_score += 1
+            else:
+                sell_score += 1
+            
+            # 2. MACD Analysis (peso: 2 puntos)
+            if macd > macd_signal and macd > 0:
+                buy_score += 2
+            elif macd < macd_signal and macd < 0:
+                sell_score += 2
+            elif macd > macd_signal:
+                buy_score += 1
+            else:
+                sell_score += 1
+            
+            # 3. Moving Averages (peso: 2 puntos)
+            if current_price > sma_7 > sma_25:
+                buy_score += 2
+            elif current_price < sma_7 < sma_25:
+                sell_score += 2
+            elif current_price > sma_7:
+                buy_score += 1
+            else:
+                sell_score += 1
+            
+            # 4. Bollinger Bands (peso: 1 punto)
+            if current_price < bb_lower:
+                buy_score += 1
+            elif current_price > bb_upper:
+                sell_score += 1
+            
+            # 5. Stochastic (peso: 1 punto)
+            if stoch_k < 20:
+                buy_score += 1
+            elif stoch_k > 80:
+                sell_score += 1
+            
+            # Determinar señal basada en puntuación (máximo 8 puntos por lado)
+            if buy_score >= sell_score + 2:
+                signal = 'BUY'
+                # Confianza basada en diferencia de scores
+                confidence_base = min(50 + (buy_score - sell_score) * 8, 85)
+                probabilities = [
+                    max(0.10, (8 - buy_score) / 10),  # SELL
+                    max(0.15, 1 - confidence_base/100 - 0.15),  # HOLD
+                    confidence_base / 100  # BUY
+                ]
+            elif sell_score >= buy_score + 2:
+                signal = 'SELL'
+                confidence_base = min(50 + (sell_score - buy_score) * 8, 85)
+                probabilities = [
+                    confidence_base / 100,  # SELL
+                    max(0.15, 1 - confidence_base/100 - 0.15),  # HOLD
+                    max(0.10, (8 - sell_score) / 10)  # BUY
+                ]
+            else:
+                signal = 'HOLD'
+                confidence_base = 60
+                probabilities = [0.20, 0.60, 0.20]
+            
+            # Normalizar probabilidades para que sumen 1
+            prob_sum = sum(probabilities)
+            probabilities = [p / prob_sum for p in probabilities]
+            
+            confidence = max(probabilities) * 100
+            
+            # Calcular niveles
+            levels = self._calculate_trading_levels(signal, current_price, confidence)
+            
+            # Información de indicadores para debugging
+            indicators_info = {
+                'rsi': round(rsi, 2),
+                'macd': round(macd, 4),
+                'sma_7': round(sma_7, 2),
+                'sma_25': round(sma_25, 2),
+                'stoch_k': round(stoch_k, 2),
+                'buy_score': buy_score,
+                'sell_score': sell_score
+            }
+            
+            print(f"   RSI: {rsi:.1f}, MACD: {macd:.2f}, SMA7: ${sma_7:.2f}, SMA25: ${sma_25:.2f}")
+            print(f"   Scores - BUY: {buy_score}, SELL: {sell_score} → {signal}")
+            
+            return {
+                'symbol': symbol,
+                'signal': signal,
+                'confidence': round(confidence, 2),
+                
+                'current_price': round(current_price, 2),
+                'entry_price': levels['entry'],
+                'target_1': levels['target_1'],
+                'target_2': levels['target_2'],
+                'stop_loss': levels['stop_loss'],
+                
+                'timeframe': self._calculate_timeframe(confidence),
+                'risk_level': self._calculate_risk(signal, confidence),
+                
+                'probabilities': {
+                    'SELL': round(probabilities[0] * 100, 2),
+                    'HOLD': round(probabilities[1] * 100, 2),
+                    'BUY': round(probabilities[2] * 100, 2)
+                },
+                
+                'indicators': indicators_info,
+                
+                'predicted_at': datetime.now(timezone.utc).isoformat(),
+                'model_version': 'MOCK_v2_Technical_Analysis',
+                'is_mock': True
+            }
+            
+        except Exception as e:
+            print(f"   Error calculando indicadores: {e}")
+            print("   Usando lógica simple de respaldo...")
+            
+            # Fallback a lógica simple
+            close = df['close'].iloc[-20:]
+            sma_7 = close.rolling(7).mean().iloc[-1]
+            sma_25 = close.rolling(25).mean().iloc[-1] if len(close) >= 25 else close.mean()
+            
+            if current_price > sma_7 > sma_25:
+                signal = 'BUY'
+                probabilities = [0.15, 0.20, 0.65]
+            elif current_price < sma_7 < sma_25:
+                signal = 'SELL'
+                probabilities = [0.65, 0.20, 0.15]
+            else:
+                signal = 'HOLD'
+                probabilities = [0.20, 0.60, 0.20]
+            
+            confidence = max(probabilities) * 100
+            levels = self._calculate_trading_levels(signal, current_price, confidence)
+            
+            return {
+                'symbol': symbol,
+                'signal': signal,
+                'confidence': round(confidence, 2),
+                'current_price': round(current_price, 2),
+                'entry_price': levels['entry'],
+                'target_1': levels['target_1'],
+                'target_2': levels['target_2'],
+                'stop_loss': levels['stop_loss'],
+                'timeframe': self._calculate_timeframe(confidence),
+                'risk_level': self._calculate_risk(signal, confidence),
+                'probabilities': {
+                    'SELL': round(probabilities[0] * 100, 2),
+                    'HOLD': round(probabilities[1] * 100, 2),
+                    'BUY': round(probabilities[2] * 100, 2)
+                },
+                'predicted_at': datetime.now(timezone.utc).isoformat(),
+                'model_version': 'MOCK_v1_Simple',
+                'is_mock': True
+            }
     
     def _calculate_trading_levels(self, signal, current_price, confidence):
         """Calcular niveles de entrada, targets y stop loss"""

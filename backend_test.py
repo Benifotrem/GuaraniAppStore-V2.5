@@ -1254,10 +1254,10 @@ class GuaraniBackendTester:
                         f"Scoring inconsistencies: {'; '.join(scoring_errors[:3])}")
 
     def run_all_tests(self):
-        """Run all backend tests focusing on Momentum Predictor IA"""
+        """Run all backend tests focusing on CryptoShield IA"""
         print("=" * 70)
         print("GuaraniAppStore V2.5 Pro Backend Testing Suite")
-        print("Focus: MOMENTUM PREDICTOR IA - FASE 2 LÓGICA COMPLETA")
+        print("Focus: CRYPTOSHIELD IA - SISTEMA COMPLETO DE DETECCIÓN DE FRAUDE")
         print("=" * 70)
         print()
         
@@ -1279,38 +1279,47 @@ class GuaraniBackendTester:
         print("👤 Testing Admin Access...")
         self.test_admin_login()
         
-        # MOMENTUM PREDICTOR IA TESTING - FASE 2
-        print("🎯 Testing Momentum Predictor IA - Fase 2 (Technical Analysis Complete)...")
+        # CRYPTOSHIELD IA TESTING - COMPLETE SYSTEM
+        print("🛡️ Testing CryptoShield IA - Sistema Completo de Detección de Fraude...")
         
         # 1. Health Check
-        print("   📊 Health Check...")
-        self.test_momentum_health_check()
+        print("   🏥 Health Check...")
+        self.test_cryptoshield_health_check()
         
-        # 2. Signal Generation for multiple symbols (5 symbols for better variety testing)
-        print("   🔮 Signal Generation with Technical Analysis...")
-        for symbol in self.test_symbols:
-            self.test_momentum_signal_generation(symbol)
+        # 2. Wallet Scanning (3 test wallets)
+        print("   👛 Wallet Scanning...")
+        wallet_names = ["Vitalik Buterin", "Binance Hot Wallet", "Null Address"]
+        for i, address in enumerate(self.test_wallets):
+            self.test_cryptoshield_wallet_scan(address, wallet_names[i])
             time.sleep(1)  # Small delay between requests
         
-        # 3. Signals History
-        print("   📈 Signals History...")
-        self.test_momentum_signals_history()
+        # 3. Transaction Verification (2 test transactions)
+        print("   🔄 Transaction Verification...")
+        tx_names = ["First Ethereum TX", "Invalid TX"]
+        for i, tx_hash in enumerate(self.test_tx_hashes):
+            self.test_cryptoshield_transaction_verify(tx_hash, tx_names[i])
+            time.sleep(1)
         
-        # 4. Stats for symbols (after generating signals)
-        print("   📊 Symbol Statistics...")
-        for symbol in self.test_symbols:
-            self.test_momentum_stats(symbol)
+        # 4. Contract Scanning (USDT contract)
+        print("   📄 Contract Scanning...")
+        self.test_cryptoshield_contract_scan(self.test_contract)
         
-        # 5. Error handling
-        print("   ❌ Error Handling...")
-        self.test_momentum_stats_nonexistent_symbol()
+        # 5. Scan History
+        print("   📚 Scan History...")
+        self.test_cryptoshield_scan_history()
         
-        # 6. FASE 2 SPECIFIC TESTS
-        print("   🧮 Fase 2 Specific Validations...")
-        self.test_signal_variety_across_symbols()
-        self.test_confidence_variation()
-        self.test_scoring_system_logic()
-        self.test_technical_indicators_realism()
+        # 6. Statistics
+        print("   📊 Statistics...")
+        self.test_cryptoshield_stats()
+        
+        # 7. Validation and Error Handling
+        print("   ❌ Validation & Error Handling...")
+        self.test_cryptoshield_validation_errors()
+        
+        # 8. CRITICAL VALIDATIONS
+        print("   🔍 Critical System Validations...")
+        self.test_cryptoshield_etherscan_integration()
+        self.test_cryptoshield_risk_scoring_consistency()
         
         # Summary
         self.print_summary()

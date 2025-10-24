@@ -751,7 +751,7 @@ class GuaraniBackendTester:
         """Run all backend tests focusing on Momentum Predictor IA"""
         print("=" * 70)
         print("GuaraniAppStore V2.5 Pro Backend Testing Suite")
-        print("Focus: MOMENTUM PREDICTOR IA - FASE 1 INTEGRACIÓN")
+        print("Focus: MOMENTUM PREDICTOR IA - FASE 2 LÓGICA COMPLETA")
         print("=" * 70)
         print()
         

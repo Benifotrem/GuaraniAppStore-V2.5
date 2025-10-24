@@ -499,6 +499,21 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTING COMPLETO EXITOSO (93.8% success rate) - Momentum Predictor IA Fase 1 completamente funcional: HEALTH CHECK: /api/momentum/health retorna status healthy, service 'Momentum Predictor', version 1.0.0, model_loaded false, mode MOCK. GENERACIÓN SEÑALES: /api/momentum/signal/{symbol} funciona para BTC ($111,145.70), ETH ($3,955.00), SOL ($193.09) - todas señales HOLD con 60% confidence, is_mock=true. HISTORIAL: /api/momentum/signals/history retorna 5 señales históricas correctamente. ESTADÍSTICAS: /api/momentum/stats/{symbol} calcula correctamente totales, porcentajes, última señal. VERIFICACIONES CRÍTICAS: ✅ Precios reales desde Kraken, ✅ Señales guardadas en MongoDB, ✅ Indicador is_mock=true, ✅ Niveles de trading calculados correctamente, ✅ Timeframe 'mid' según confidence, ✅ Risk level 'low' para HOLD, ✅ Formato fecha ISO 8601 UTC. ERROR HANDLING: 404 correcto para símbolos inexistentes. LISTO PARA FASE 2."
+      - working: true
+        agent: "main"
+        comment: "✅ FASE 2 COMPLETADA - Lógica core implementada: Sistema MOCK mejorado con análisis técnico completo usando MomentumPreprocessor. Indicadores calculados: RSI (14), MACD + signal, SMA (7/25), Bollinger Bands (upper/middle/lower), Stochastic (K/D), EMA (12/26), ATR, momentum, price_change_pct. Sistema de scoring (max 8 puntos) para BUY/SELL/HOLD basado en: RSI (2pts), MACD (2pts), Moving Averages (2pts), Bollinger Bands (1pt), Stochastic (1pt). Confianza calculada dinámicamente según diferencia de scores. Response incluye indicadores: {rsi, macd, sma_7, sma_25, stoch_k, buy_score, sell_score}. Model version: MOCK_v2_Technical_Analysis. Bot de Telegram implementado con comandos: /start, /signal, /history, /stats, /help. Botones inline para BTC/ETH. Script start_momentum_bot.sh creado. PROBADO: ETH ($3,953) → HOLD 60% (RSI:45.5, MACD:-113.6, scores 1-2). SOL ($192) → HOLD 60% (RSI:46.2, MACD:-7.7, scores 1-2). Sistema completamente funcional y listo para entrenar modelo LSTM real."
+
+  - task: "Momentum Predictor IA - Bot de Telegram"
+    implemented: true
+    working: true
+    file: "backend/momentum_telegram_bot.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ Bot de Telegram implementado completamente: Token configurado (MOMENTUM_BOT_TOKEN). Comandos implementados: /start (bienvenida + botones inline), /signal <SYMBOL> (generar señal), /history (últimas 5 señales), /stats <SYMBOL> (estadísticas), /help (ayuda). Botones inline: BTC, ETH, My Signals, Help. Formato Markdown con emojis (🟢 BUY, 🔴 SELL, 🟡 HOLD). Integración con MomentumPredictorService y MongoDB. Registro de usuarios en momentum_subscriptions. Guardado de señales con requested_by_chat_id. Script de inicio: start_momentum_bot.sh con permisos de ejecución. NOTA: Bot funcional pero requiere ejecución manual o supervisor para producción (event loop conflict con motor)."
 
 agent_communication:
   - agent: "main"

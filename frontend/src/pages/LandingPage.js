@@ -475,17 +475,14 @@ const LandingPage = ({ services }) => {
                   
                   {/* Features */}
                   {service.features && service.features.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-emerald-700 mb-2">✨ Incluye:</p>
-                      <div className="space-y-1">
-                        {service.features.slice(0, 6).map((feature, fidx) => (
-                          <div key={fidx} className="flex items-start text-xs text-gray-700">
-                            <span className="text-green-500 mr-2">✓</span>
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <ul className="space-y-2 mb-6">
+                      {service.features.map((feature, fidx) => (
+                        <li key={fidx} className="flex items-start gap-2 text-gray-700 text-sm">
+                          <span className="text-emerald-500 flex-shrink-0 mt-0.5">✓</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                   
                   {/* Button */}

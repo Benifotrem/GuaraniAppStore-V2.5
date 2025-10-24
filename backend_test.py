@@ -760,6 +760,499 @@ class GuaraniBackendTester:
         
         return all([valid_entry, valid_targets, valid_stop])
 
+    def test_cryptoshield_health_check(self):
+        """Test CryptoShield health check endpoint"""
+        success, data, status_code = self.make_request('GET', '/cryptoshield/health')
+        
+        if success and isinstance(data, dict):
+            expected_fields = ['status', 'service', 'version', 'mode', 'etherscan_api']
+            missing_fields = [field for field in expected_fields if field not in data]
+            
+            if not missing_fields:
+                status = data.get('status')
+                service = data.get('service')
+                version = data.get('version')
+                mode = data.get('mode')
+                etherscan_api = data.get('etherscan_api')
+                
+                if (status == 'healthy' and 
+                    service == 'CryptoShield IA' and 
+                    version == '1.0.0' and 
+                    mode == 'MOCK' and 
+                    etherscan_api == 'configured'):
+                    self.log_test("CryptoShield Health Check", True, 
+                                f"Status: {status}, Service: {service}, Version: {version}, Mode: {mode}, Etherscan: {etherscan_api}")
+                else:
+                    self.log_test("CryptoShield Health Check", False, 
+                                f"Unexpected values - Status: {status}, Mode: {mode}, Etherscan: {etherscan_api}")
+            else:
+                self.log_test("CryptoShield Health Check", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test("CryptoShield Health Check", False, f"Status code: {status_code}", data)
+
+    def test_cryptoshield_wallet_scan(self, address: str, expected_name: str = ""):
+        """Test wallet scanning with CryptoShield"""
+        success, data, status_code = self.make_request('GET', f'/cryptoshield/scan/wallet/{address}')
+        
+        if success and isinstance(data, dict):
+            # Check required fields
+            required_fields = [
+                'address', 'balance_eth', 'transaction_count', 'risk_score', 'risk_level',
+                'risk_factors', 'recommendations', 'scan_type', 'model_version', 'is_mock', 'analyzed_at'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                # Validate field values
+                address_val = data.get('address')
+                balance_eth = data.get('balance_eth')
+                tx_count = data.get('transaction_count')
+                risk_score = data.get('risk_score')
+                risk_level = data.get('risk_level')
+                risk_factors = data.get('risk_factors', [])
+                recommendations = data.get('recommendations', [])
+                scan_type = data.get('scan_type')
+                model_version = data.get('model_version')
+                is_mock = data.get('is_mock')
+                analyzed_at = data.get('analyzed_at')
+                
+                # Validations
+                valid_address = address_val == address
+                valid_balance = isinstance(balance_eth, (int, float)) and balance_eth >= 0
+                valid_tx_count = isinstance(tx_count, int) and tx_count >= 0
+                valid_risk_score = isinstance(risk_score, int) and 0 <= risk_score <= 100
+                valid_risk_level = risk_level in ['low', 'medium', 'high']
+                valid_risk_factors = isinstance(risk_factors, list)
+                valid_recommendations = isinstance(recommendations, list) and len(recommendations) >= 2
+                valid_scan_type = scan_type == 'wallet'
+                valid_model_version = model_version == 'MOCK'
+                valid_is_mock = is_mock == True
+                
+                # Check date format (ISO 8601)
+                valid_date = False
+                try:
+                    from datetime import datetime
+                    datetime.fromisoformat(analyzed_at.replace('Z', '+00:00'))
+                    valid_date = True
+                except:
+                    pass
+                
+                # Check if data is realistic (not hardcoded)
+                realistic_data = True
+                if address == '0x0000000000000000000000000000000000000000':
+                    # Null address should have 0 balance and transactions
+                    realistic_data = balance_eth == 0 and tx_count == 0
+                else:
+                    # Real addresses should have some activity or balance
+                    realistic_data = balance_eth > 0 or tx_count > 0
+                
+                all_valid = all([
+                    valid_address, valid_balance, valid_tx_count, valid_risk_score, valid_risk_level,
+                    valid_risk_factors, valid_recommendations, valid_scan_type, valid_model_version,
+                    valid_is_mock, valid_date, realistic_data
+                ])
+                
+                if all_valid:
+                    # Store for history testing
+                    self.cryptoshield_scans.append(data)
+                    
+                    self.log_test(f"CryptoShield Wallet Scan ({expected_name})", True, 
+                                f"Address: {address[:10]}..., Balance: {balance_eth:.4f} ETH, "
+                                f"TXs: {tx_count:,}, Risk: {risk_level.upper()} ({risk_score}/100)")
+                else:
+                    validation_errors = []
+                    if not valid_address: validation_errors.append(f"Address mismatch: {address_val}")
+                    if not valid_balance: validation_errors.append(f"Invalid balance: {balance_eth}")
+                    if not valid_tx_count: validation_errors.append(f"Invalid TX count: {tx_count}")
+                    if not valid_risk_score: validation_errors.append(f"Invalid risk score: {risk_score}")
+                    if not valid_risk_level: validation_errors.append(f"Invalid risk level: {risk_level}")
+                    if not valid_risk_factors: validation_errors.append("Invalid risk factors format")
+                    if not valid_recommendations: validation_errors.append(f"Need >=2 recommendations, got {len(recommendations)}")
+                    if not valid_scan_type: validation_errors.append(f"Expected scan_type='wallet', got '{scan_type}'")
+                    if not valid_model_version: validation_errors.append(f"Expected model_version='MOCK', got '{model_version}'")
+                    if not valid_is_mock: validation_errors.append(f"Expected is_mock=True, got {is_mock}")
+                    if not valid_date: validation_errors.append(f"Invalid date format: {analyzed_at}")
+                    if not realistic_data: validation_errors.append("Data appears hardcoded, not from Etherscan")
+                    
+                    self.log_test(f"CryptoShield Wallet Scan ({expected_name})", False, "; ".join(validation_errors))
+            else:
+                self.log_test(f"CryptoShield Wallet Scan ({expected_name})", False, f"Missing fields: {missing_fields}")
+        else:
+            # Check if it's a validation error (400) for invalid addresses
+            if status_code == 400 and address == '0x0000000000000000000000000000000000000000':
+                self.log_test(f"CryptoShield Wallet Scan ({expected_name})", True, 
+                            "Correctly rejected invalid address format with 400 Bad Request")
+            else:
+                self.log_test(f"CryptoShield Wallet Scan ({expected_name})", False, f"Status code: {status_code}", data)
+
+    def test_cryptoshield_transaction_verify(self, tx_hash: str, expected_name: str = ""):
+        """Test transaction verification with CryptoShield"""
+        success, data, status_code = self.make_request('GET', f'/cryptoshield/verify/transaction/{tx_hash}')
+        
+        if success and isinstance(data, dict):
+            # Check required fields
+            required_fields = [
+                'tx_hash', 'status', 'is_success', 'risk_score', 'risk_level',
+                'risk_factors', 'recommendations', 'scan_type', 'model_version', 'is_mock', 'verified_at'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                # Validate field values
+                tx_hash_val = data.get('tx_hash')
+                status = data.get('status')
+                is_success = data.get('is_success')
+                risk_score = data.get('risk_score')
+                risk_level = data.get('risk_level')
+                recommendations = data.get('recommendations', [])
+                scan_type = data.get('scan_type')
+                model_version = data.get('model_version')
+                is_mock = data.get('is_mock')
+                verified_at = data.get('verified_at')
+                
+                # Validations
+                valid_tx_hash = tx_hash_val == tx_hash
+                valid_status = status in ['success', 'failed']
+                valid_is_success = isinstance(is_success, bool)
+                valid_risk_score = isinstance(risk_score, int) and 0 <= risk_score <= 100
+                valid_risk_level = risk_level in ['low', 'medium', 'high']
+                valid_recommendations = isinstance(recommendations, list) and len(recommendations) >= 1
+                valid_scan_type = scan_type == 'transaction'
+                valid_model_version = model_version == 'MOCK'
+                valid_is_mock = is_mock == True
+                
+                # Check contextual recommendations
+                contextual_recs = True
+                if status == 'success' and risk_level == 'low':
+                    contextual_recs = any('safe' in rec.lower() or 'low risk' in rec.lower() for rec in recommendations)
+                elif status == 'failed':
+                    contextual_recs = risk_score >= 50  # Failed transactions should have higher risk
+                
+                # Check date format
+                valid_date = False
+                try:
+                    from datetime import datetime
+                    datetime.fromisoformat(verified_at.replace('Z', '+00:00'))
+                    valid_date = True
+                except:
+                    pass
+                
+                all_valid = all([
+                    valid_tx_hash, valid_status, valid_is_success, valid_risk_score, valid_risk_level,
+                    valid_recommendations, valid_scan_type, valid_model_version, valid_is_mock, 
+                    valid_date, contextual_recs
+                ])
+                
+                if all_valid:
+                    self.cryptoshield_scans.append(data)
+                    
+                    self.log_test(f"CryptoShield TX Verify ({expected_name})", True, 
+                                f"TX: {tx_hash[:10]}..., Status: {status.upper()}, "
+                                f"Success: {is_success}, Risk: {risk_level.upper()} ({risk_score}/100)")
+                else:
+                    validation_errors = []
+                    if not valid_tx_hash: validation_errors.append(f"TX hash mismatch")
+                    if not valid_status: validation_errors.append(f"Invalid status: {status}")
+                    if not valid_is_success: validation_errors.append(f"Invalid is_success type: {type(is_success)}")
+                    if not valid_risk_score: validation_errors.append(f"Invalid risk score: {risk_score}")
+                    if not valid_risk_level: validation_errors.append(f"Invalid risk level: {risk_level}")
+                    if not valid_recommendations: validation_errors.append(f"Need >=1 recommendation, got {len(recommendations)}")
+                    if not valid_scan_type: validation_errors.append(f"Expected scan_type='transaction'")
+                    if not valid_model_version: validation_errors.append(f"Expected model_version='MOCK'")
+                    if not valid_is_mock: validation_errors.append(f"Expected is_mock=True")
+                    if not valid_date: validation_errors.append(f"Invalid date format")
+                    if not contextual_recs: validation_errors.append("Recommendations not contextual to status")
+                    
+                    self.log_test(f"CryptoShield TX Verify ({expected_name})", False, "; ".join(validation_errors))
+            else:
+                self.log_test(f"CryptoShield TX Verify ({expected_name})", False, f"Missing fields: {missing_fields}")
+        else:
+            # Check if it's a validation error (400) for invalid tx hashes
+            if status_code == 400 and tx_hash == '0x0000000000000000000000000000000000000000000000000000000000000000':
+                self.log_test(f"CryptoShield TX Verify ({expected_name})", True, 
+                            "Correctly rejected invalid TX hash format with 400 Bad Request")
+            else:
+                self.log_test(f"CryptoShield TX Verify ({expected_name})", False, f"Status code: {status_code}", data)
+
+    def test_cryptoshield_contract_scan(self, contract_address: str):
+        """Test contract scanning with CryptoShield"""
+        success, data, status_code = self.make_request('GET', f'/cryptoshield/scan/contract/{contract_address}')
+        
+        if success and isinstance(data, dict):
+            # Check required fields
+            required_fields = [
+                'contract_address', 'is_contract', 'is_verified', 'risk_score', 'risk_level',
+                'risk_factors', 'recommendations', 'scan_type', 'model_version', 'is_mock', 'analyzed_at'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                # Validate field values
+                contract_addr = data.get('contract_address')
+                is_contract = data.get('is_contract')
+                is_verified = data.get('is_verified')
+                risk_score = data.get('risk_score')
+                risk_level = data.get('risk_level')
+                recommendations = data.get('recommendations', [])
+                scan_type = data.get('scan_type')
+                model_version = data.get('model_version')
+                is_mock = data.get('is_mock')
+                
+                # Validations
+                valid_address = contract_addr == contract_address
+                valid_is_contract = is_contract == True  # USDT should be a contract
+                valid_is_verified = isinstance(is_verified, bool)
+                valid_risk_score = isinstance(risk_score, int) and 0 <= risk_score <= 100
+                valid_risk_level = risk_level in ['low', 'medium', 'high']
+                valid_recommendations = isinstance(recommendations, list) and len(recommendations) >= 1
+                valid_scan_type = scan_type == 'contract'
+                valid_model_version = model_version == 'MOCK'
+                valid_is_mock = is_mock == True
+                
+                # Risk assessment should be appropriate for contracts
+                appropriate_risk = True
+                if contract_address == '0xdAC17F958D2ee523a2206206994597C13D831ec7':  # USDT
+                    # USDT is a well-known contract, should be low-medium risk
+                    appropriate_risk = risk_level in ['low', 'medium']
+                
+                all_valid = all([
+                    valid_address, valid_is_contract, valid_is_verified, valid_risk_score, 
+                    valid_risk_level, valid_recommendations, valid_scan_type, valid_model_version,
+                    valid_is_mock, appropriate_risk
+                ])
+                
+                if all_valid:
+                    self.cryptoshield_scans.append(data)
+                    
+                    self.log_test("CryptoShield Contract Scan (USDT)", True, 
+                                f"Contract: {contract_address[:10]}..., Is Contract: {is_contract}, "
+                                f"Verified: {is_verified}, Risk: {risk_level.upper()} ({risk_score}/100)")
+                else:
+                    validation_errors = []
+                    if not valid_address: validation_errors.append("Address mismatch")
+                    if not valid_is_contract: validation_errors.append(f"Expected is_contract=True, got {is_contract}")
+                    if not valid_is_verified: validation_errors.append(f"Invalid is_verified type")
+                    if not valid_risk_score: validation_errors.append(f"Invalid risk score: {risk_score}")
+                    if not valid_risk_level: validation_errors.append(f"Invalid risk level: {risk_level}")
+                    if not valid_recommendations: validation_errors.append("Need >=1 recommendation")
+                    if not valid_scan_type: validation_errors.append("Expected scan_type='contract'")
+                    if not valid_model_version: validation_errors.append("Expected model_version='MOCK'")
+                    if not valid_is_mock: validation_errors.append("Expected is_mock=True")
+                    if not appropriate_risk: validation_errors.append("Risk assessment inappropriate for USDT contract")
+                    
+                    self.log_test("CryptoShield Contract Scan (USDT)", False, "; ".join(validation_errors))
+            else:
+                self.log_test("CryptoShield Contract Scan (USDT)", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test("CryptoShield Contract Scan (USDT)", False, f"Status code: {status_code}", data)
+
+    def test_cryptoshield_scan_history(self):
+        """Test scan history endpoint"""
+        # Test general history
+        success, data, status_code = self.make_request('GET', '/cryptoshield/scans/history?limit=10')
+        
+        if success and isinstance(data, list):
+            if len(data) > 0:
+                # Check structure of first scan
+                first_scan = data[0]
+                required_fields = ['scan_type', 'address_or_hash', 'risk_level', 'risk_score', 'scanned_at']
+                missing_fields = [field for field in required_fields if field not in first_scan]
+                
+                if not missing_fields:
+                    # Verify ordering (should be descending by date)
+                    ordered_correctly = True
+                    if len(data) > 1:
+                        try:
+                            from datetime import datetime
+                            dates = []
+                            for scan in data:
+                                date_str = scan.get('scanned_at', '')
+                                if isinstance(date_str, str):
+                                    dates.append(datetime.fromisoformat(date_str.replace('Z', '+00:00')))
+                            
+                            # Check if dates are in descending order
+                            ordered_correctly = all(dates[i] >= dates[i+1] for i in range(len(dates)-1))
+                        except:
+                            ordered_correctly = False
+                    
+                    if ordered_correctly:
+                        self.log_test("CryptoShield Scan History", True, 
+                                    f"Retrieved {len(data)} scans, ordered by date descending")
+                    else:
+                        self.log_test("CryptoShield Scan History", False, 
+                                    "Scans not ordered by date descending")
+                else:
+                    self.log_test("CryptoShield Scan History", False, 
+                                f"History items missing fields: {missing_fields}")
+            else:
+                self.log_test("CryptoShield Scan History", True, "No scan history yet (expected for new system)")
+        else:
+            self.log_test("CryptoShield Scan History", False, f"Status code: {status_code}", data)
+        
+        # Test filtered history by scan_type
+        success, data, status_code = self.make_request('GET', '/cryptoshield/scans/history?scan_type=wallet&limit=5')
+        
+        if success and isinstance(data, list):
+            # All items should be wallet scans
+            all_wallets = all(item.get('scan_type') == 'wallet' for item in data)
+            if all_wallets:
+                self.log_test("CryptoShield Scan History (Filtered)", True, 
+                            f"Retrieved {len(data)} wallet scans (filter working)")
+            else:
+                self.log_test("CryptoShield Scan History (Filtered)", False, 
+                            "Filter not working - non-wallet scans included")
+        else:
+            self.log_test("CryptoShield Scan History (Filtered)", False, 
+                        f"Status code: {status_code}", data)
+
+    def test_cryptoshield_stats(self):
+        """Test CryptoShield statistics endpoint"""
+        success, data, status_code = self.make_request('GET', '/cryptoshield/stats')
+        
+        if success and isinstance(data, dict):
+            required_fields = [
+                'total_scans', 'wallet_scans', 'transaction_verifications', 'contract_scans',
+                'high_risk_found', 'medium_risk_found', 'low_risk_found', 'high_risk_percentage'
+            ]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                total_scans = data.get('total_scans', 0)
+                wallet_scans = data.get('wallet_scans', 0)
+                tx_scans = data.get('transaction_verifications', 0)
+                contract_scans = data.get('contract_scans', 0)
+                high_risk = data.get('high_risk_found', 0)
+                medium_risk = data.get('medium_risk_found', 0)
+                low_risk = data.get('low_risk_found', 0)
+                high_risk_percentage = data.get('high_risk_percentage', 0)
+                
+                # Validate calculations
+                calculated_total = wallet_scans + tx_scans + contract_scans
+                calculated_risk_total = high_risk + medium_risk + low_risk
+                calculated_percentage = (high_risk / total_scans * 100) if total_scans > 0 else 0
+                
+                # Check if calculations are correct
+                total_correct = calculated_total == total_scans
+                risk_total_correct = calculated_risk_total == total_scans
+                percentage_correct = abs(calculated_percentage - high_risk_percentage) < 0.1
+                
+                if total_correct and risk_total_correct and percentage_correct:
+                    self.log_test("CryptoShield Statistics", True, 
+                                f"Total: {total_scans}, Wallets: {wallet_scans}, TXs: {tx_scans}, "
+                                f"Contracts: {contract_scans}, High Risk: {high_risk} ({high_risk_percentage}%)")
+                else:
+                    errors = []
+                    if not total_correct: errors.append(f"Total mismatch: {calculated_total} vs {total_scans}")
+                    if not risk_total_correct: errors.append(f"Risk total mismatch: {calculated_risk_total} vs {total_scans}")
+                    if not percentage_correct: errors.append(f"Percentage mismatch: {calculated_percentage:.2f}% vs {high_risk_percentage}%")
+                    
+                    self.log_test("CryptoShield Statistics", False, "; ".join(errors))
+            else:
+                self.log_test("CryptoShield Statistics", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test("CryptoShield Statistics", False, f"Status code: {status_code}", data)
+
+    def test_cryptoshield_validation_errors(self):
+        """Test CryptoShield validation and error handling"""
+        # Test invalid address format
+        success, data, status_code = self.make_request('GET', '/cryptoshield/scan/wallet/invalid_address')
+        
+        if status_code == 400:
+            self.log_test("CryptoShield Address Validation", True, 
+                        "Correctly rejected invalid address format with 400 Bad Request")
+        else:
+            self.log_test("CryptoShield Address Validation", False, 
+                        f"Expected 400 for invalid address, got {status_code}")
+        
+        # Test invalid tx hash format
+        success, data, status_code = self.make_request('GET', '/cryptoshield/verify/transaction/invalid_hash')
+        
+        if status_code == 400:
+            self.log_test("CryptoShield TX Hash Validation", True, 
+                        "Correctly rejected invalid TX hash format with 400 Bad Request")
+        else:
+            self.log_test("CryptoShield TX Hash Validation", False, 
+                        f"Expected 400 for invalid TX hash, got {status_code}")
+
+    def test_cryptoshield_etherscan_integration(self):
+        """Test that CryptoShield uses real Etherscan data (not hardcoded)"""
+        if not self.cryptoshield_scans:
+            self.log_test("CryptoShield Etherscan Integration", False, 
+                        "No scans performed to test Etherscan integration")
+            return
+        
+        # Check if we have realistic, varying data
+        wallet_scans = [scan for scan in self.cryptoshield_scans if scan.get('scan_type') == 'wallet']
+        
+        if len(wallet_scans) >= 2:
+            # Check if balances and transaction counts vary (indicating real data)
+            balances = [scan.get('balance_eth', 0) for scan in wallet_scans]
+            tx_counts = [scan.get('transaction_count', 0) for scan in wallet_scans]
+            
+            balance_varies = len(set(balances)) > 1
+            tx_count_varies = len(set(tx_counts)) > 1
+            
+            # Check if Vitalik's wallet has realistic data
+            vitalik_scan = None
+            for scan in wallet_scans:
+                if scan.get('address') == '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045':
+                    vitalik_scan = scan
+                    break
+            
+            vitalik_realistic = False
+            if vitalik_scan:
+                # Vitalik should have significant balance and many transactions
+                balance = vitalik_scan.get('balance_eth', 0)
+                tx_count = vitalik_scan.get('transaction_count', 0)
+                vitalik_realistic = balance > 1 and tx_count > 10  # Conservative estimates
+            
+            if balance_varies and tx_count_varies and vitalik_realistic:
+                self.log_test("CryptoShield Etherscan Integration", True, 
+                            "Data varies between wallets and Vitalik's wallet has realistic values - using real Etherscan data")
+            else:
+                issues = []
+                if not balance_varies: issues.append("Balances don't vary")
+                if not tx_count_varies: issues.append("TX counts don't vary")
+                if not vitalik_realistic: issues.append("Vitalik's data unrealistic")
+                
+                self.log_test("CryptoShield Etherscan Integration", False, 
+                            f"Data appears hardcoded: {'; '.join(issues)}")
+        else:
+            self.log_test("CryptoShield Etherscan Integration", False, 
+                        "Not enough wallet scans to verify Etherscan integration")
+
+    def test_cryptoshield_risk_scoring_consistency(self):
+        """Test that risk scoring is consistent with data"""
+        if not self.cryptoshield_scans:
+            self.log_test("CryptoShield Risk Scoring", False, 
+                        "No scans performed to test risk scoring")
+            return
+        
+        scoring_errors = []
+        consistent_scores = 0
+        
+        for scan in self.cryptoshield_scans:
+            scan_type = scan.get('scan_type')
+            risk_level = scan.get('risk_level')
+            risk_score = scan.get('risk_score', 0)
+            
+            # Check risk level consistency with score
+            if risk_level == 'low' and not (0 <= risk_score <= 39):
+                scoring_errors.append(f"{scan_type}: LOW risk but score {risk_score} not 0-39")
+            elif risk_level == 'medium' and not (40 <= risk_score <= 69):
+                scoring_errors.append(f"{scan_type}: MEDIUM risk but score {risk_score} not 40-69")
+            elif risk_level == 'high' and not (70 <= risk_score <= 100):
+                scoring_errors.append(f"{scan_type}: HIGH risk but score {risk_score} not 70-100")
+            else:
+                consistent_scores += 1
+        
+        if not scoring_errors:
+            self.log_test("CryptoShield Risk Scoring", True, 
+                        f"All {consistent_scores} scans have consistent risk levels and scores")
+        else:
+            self.log_test("CryptoShield Risk Scoring", False, 
+                        f"Scoring inconsistencies: {'; '.join(scoring_errors[:3])}")
+
     def run_all_tests(self):
         """Run all backend tests focusing on Momentum Predictor IA"""
         print("=" * 70)

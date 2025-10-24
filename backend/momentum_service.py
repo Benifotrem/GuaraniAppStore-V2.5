@@ -243,7 +243,17 @@ class MomentumPredictorService:
                 # For HOLD, confidence varies based on how close the scores are
                 score_diff = abs(buy_score - sell_score)
                 confidence_base = max(50, 65 - score_diff * 5)  # Lower confidence when scores are closer
-                probabilities = [0.20, 0.60, 0.20]
+                
+                # Make probabilities dynamic based on which score is higher
+                if buy_score > sell_score:
+                    # Slight BUY bias
+                    probabilities = [0.15, 0.55, 0.30]
+                elif sell_score > buy_score:
+                    # Slight SELL bias
+                    probabilities = [0.30, 0.55, 0.15]
+                else:
+                    # Equal scores - neutral
+                    probabilities = [0.20, 0.60, 0.20]
             
             # Normalizar probabilidades para que sumen 1
             prob_sum = sum(probabilities)

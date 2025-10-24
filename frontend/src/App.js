@@ -36,7 +36,34 @@ function App() {
   const fetchServices = async () => {
     try {
       const response = await axios.get(`${API}/services`);
-      setServices(response.data);
+      
+      // Definir servicios "próximamente" - actualizar según se desarrollen
+      const proximamenteList = [
+        'Automatización y Gestión de E-commerce',
+        'Automatización de Contenidos en redes sociales',
+        'Generador de Blogs Automatizado y SEO',
+        'Agente de Ventas IA'
+      ];
+      
+      const allServices = response.data.services || response.data;
+      
+      // Marcar servicios próximamente
+      const servicesWithStatus = allServices.map(service => ({
+        ...service,
+        status: proximamenteList.includes(service.name) ? 'coming_soon' : (service.status || 'active')
+      }));
+      
+      // Separar y reordenar: crypto primero, luego activos, luego próximamente
+      const cryptoService = servicesWithStatus.find(s => s.slug === 'suite-crypto' || s.name.toLowerCase().includes('crypto'));
+      const activeServices = servicesWithStatus.filter(s => s.status === 'active' && s.slug !== 'suite-crypto' && !s.name.toLowerCase().includes('crypto'));
+      const comingSoonServices = servicesWithStatus.filter(s => s.status === 'coming_soon');
+      
+      const orderedServices = [];
+      if (cryptoService) orderedServices.push(cryptoService);
+      orderedServices.push(...activeServices);
+      orderedServices.push(...comingSoonServices);
+      
+      setServices(orderedServices);
     } catch (error) {
       console.error('Error fetching services:', error);
     }

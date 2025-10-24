@@ -333,7 +333,7 @@ class GuaraniBackendTester:
             self.log_test("Invalid Bot Name", False, f"Expected 400, got {status_code}", data)
 
     def test_momentum_health_check(self):
-        """Test Momentum Predictor health check endpoint"""
+        """Test Momentum Predictor health check endpoint - FASE 2"""
         success, data, status_code = self.make_request('GET', '/momentum/health')
         
         if success and isinstance(data, dict):
@@ -347,13 +347,14 @@ class GuaraniBackendTester:
                 model_loaded = data.get('model_loaded')
                 mode = data.get('mode')
                 
+                # Check that health endpoint reflects Fase 2 changes
                 if (status == 'healthy' and 
                     service == 'Momentum Predictor' and 
                     version == '1.0.0' and 
                     model_loaded == False and 
                     mode == 'MOCK'):
                     self.log_test("Momentum Health Check", True, 
-                                f"Status: {status}, Service: {service}, Version: {version}, Mode: {mode}")
+                                f"Status: {status}, Service: {service}, Version: {version}, Mode: {mode} (Fase 2 Ready)")
                 else:
                     self.log_test("Momentum Health Check", False, 
                                 f"Unexpected values - Status: {status}, Mode: {mode}, Model loaded: {model_loaded}")

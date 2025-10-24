@@ -389,55 +389,6 @@ const LandingPage = ({ services }) => {
                 </div>
               ))}
             </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {service.price_monthly === 0 && service.price_annual > 0 && (
-                          <div>
-                            <div>
-                              <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_annual)}</span>
-                              <span className="text-gray-600 ml-2">/año</span>
-                            </div>
-                            <div className="text-orange-600 font-semibold text-sm mt-2">
-                              🪙 {formatPriceWithDiscount(service.price_annual)} con BTC/ETH (25% OFF)
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {service.features && (
-                    <ul className="space-y-2 mb-6">
-                      {service.features.map((feature, fidx) => (
-                        <li key={fidx} className="flex items-start gap-2 text-gray-700 text-sm">
-                          <span className="text-emerald-500 font-bold">✓</span>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      if (service.status === 'coming_soon') return;
-                      const token = localStorage.getItem('token');
-                      if (!token) {
-                        setShowAuth(true);
-                      } else {
-                        navigate(`/checkout/${service.id}`);
-                      }
-                    }}
-                    disabled={service.status === 'coming_soon'}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-xl btn-primary font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {service.status === 'coming_soon' ? 'Próximamente' : 'Suscribirse'}
-                  </button>
-                </div>
-              ))}
-            </div>
           )}
         </div>
       </section>

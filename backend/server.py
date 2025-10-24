@@ -2990,6 +2990,17 @@ except Exception as e:
     logger.warning(f"⚠️ Pulse IA endpoints not loaded: {e}")
 
 
+# ============================================
+# MOMENTUM PREDICTOR IA ENDPOINTS
+# ============================================
+try:
+    from momentum_api import router as momentum_router
+    app.include_router(momentum_router)
+    logger.info("✅ Momentum Predictor IA endpoints loaded")
+except Exception as e:
+    logger.warning(f"⚠️ Momentum Predictor IA endpoints not loaded: {e}")
+
+
 # Include router in app
 app.include_router(api_router)
 

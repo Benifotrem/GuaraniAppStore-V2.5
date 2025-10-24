@@ -249,130 +249,195 @@ const LandingPage = ({ services }) => {
                   <h4 className="text-2xl text-emerald-700 font-bold mb-3">{service.name}</h4>
                   <p className="text-base text-gray-700 mb-4">{service.short_description || service.description}</p>
                   
+                  {/* Suite Crypto - Incluye servicios */}
+                  {service.included_services && service.included_services.length > 0 && (
+                    <div className="mb-4 space-y-2">
+                      {service.included_services.map((inc, iidx) => (
+                        <div key={iidx} className="flex items-center justify-between bg-white/50 rounded-lg p-2">
+                          <span className="text-sm font-semibold text-gray-700">{inc.name}</span>
+                          {inc.status === 'GRATIS' && (
+                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">GRATIS</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
                   <div className="mb-4">
-                    {/* Consultoría Técnica - Pago único */}
-                    {service.billing_type === 'one_time' && (
+                    {/* Pago único (Consultoría) */}
+                    {service.billing_type === 'one_time' && !service.status && (
                       <div>
                         <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-3 mb-3">
                           <p className="text-purple-700 font-bold text-sm">💎 Pago Único - No Suscripción</p>
                           <p className="text-purple-600 text-xs mt-1">⏰ No caduca - Usa bajo demanda</p>
                         </div>
-                        <div>
-                          <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
-                          <span className="text-gray-600 ml-2">pago único</span>
+                        <div className="mb-3">
+                          <p className="text-xs text-gray-600 mb-1">Precio Regular:</p>
+                          <div>
+                            <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                          </div>
                         </div>
                         {service.price_crypto && (
-                          <div className="text-orange-600 font-semibold text-sm mt-2">
-                            🪙 {formatPrice(service.price_crypto)} con BTC/ETH (25% OFF)
+                          <div className="bg-orange-50 p-2 rounded-lg">
+                            <p className="text-xs text-orange-700 mb-1">🪙 Paga con BTC/ETH:</p>
+                            <div>
+                              <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_crypto)}</span>
+                              <span className="text-orange-600 ml-2 text-sm font-semibold">-25%</span>
+                            </div>
                           </div>
                         )}
                       </div>
                     )}
                     
-                    {/* Prospección Comercial - Sistema por paquetes */}
-                    {service.billing_type === 'freemium_packs' && service.packs && (
+                    {/* Plan anual únicamente (Suite Crypto) */}
+                    {service.billing_period === 'annual_only' && !service.status && (
                       <div>
-                        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-3 mb-3">
-                          <p className="text-blue-700 font-bold text-sm">📦 Sistema por Paquetes de Leads</p>
-                          <p className="text-blue-600 text-xs mt-1">🎁 Prueba GRATIS con 5 leads</p>
-                          <p className="text-blue-600 text-xs mt-1">⏰ Los usos no caducan</p>
+                        <div className="mb-3">
+                          <div>
+                            <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_annual)}</span>
+                            <span className="text-gray-600 ml-2">/año</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1">Plan anual - Acceso a los 3 servicios</p>
                         </div>
-                        <div className="space-y-2">
-                          {service.packs.map((pack, pidx) => (
-                            <div key={pidx} className={`border ${pack.popular ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'} rounded-lg p-2`}>
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm font-semibold text-gray-700">{pack.name}</span>
-                                {pack.popular && <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">Popular</span>}
-                              </div>
-                              <p className="text-xs text-gray-600">{pack.searches} búsquedas × {pack.leads_per_search} leads</p>
-                              <p className="text-lg font-bold text-emerald-700">{formatPrice(pack.price_gs)}</p>
+                        {service.price_annual_crypto && (
+                          <div className="bg-orange-50 p-2 rounded-lg">
+                            <div>
+                              <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_annual_crypto)}</span>
+                              <span className="text-gray-600 ml-1 text-sm">con BTC/ETH</span>
+                              <span className="text-orange-600 ml-2 text-sm font-semibold">(25% OFF)</span>
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     )}
                     
-                    {/* Servicios con mensajería (WhatsApp/Telegram) */}
-                    {service.billing_type === 'subscription' && service.requires_messaging && (
+                    {/* Servicios con WhatsApp/Telegram */}
+                    {service.platform === 'whatsapp_telegram' && !service.status && (
                       <div>
                         <div className="bg-indigo-50 border-2 border-indigo-300 rounded-lg p-3 mb-3">
-                          <p className="text-indigo-700 font-bold text-sm">📱 WhatsApp o Telegram</p>
-                          <p className="text-indigo-600 text-xs mt-1">💰 20% descuento en Telegram</p>
+                          <p className="text-indigo-700 font-bold text-sm">📱 Precios por Plataforma</p>
                         </div>
                         
                         {/* WhatsApp */}
-                        <div className="mb-3">
-                          <p className="text-xs text-gray-600 mb-1">📱 WhatsApp:</p>
-                          <div>
-                            <span className="text-2xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
-                            <span className="text-gray-600 ml-2">/mes</span>
-                          </div>
-                          {service.price_annual > 0 && (
-                            <div className="mt-1 text-sm">
-                              <span className="text-gray-600 font-semibold">{formatPrice(service.price_annual)}</span>
-                              <span className="text-gray-600">/año</span>
-                              <span className="text-green-600 ml-2">💰 2 meses gratis</span>
+                        <div className="mb-3 bg-white/50 rounded-lg p-3">
+                          <p className="text-sm font-bold text-green-700 mb-2">💚 WhatsApp</p>
+                          <div className="space-y-1">
+                            <div>
+                              <span className="text-xs text-gray-600">Mensual</span>
+                              <div>
+                                <span className="text-2xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                                <span className="text-gray-600 text-sm ml-1">/mes</span>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                        
-                        {/* Telegram con descuento */}
-                        <div className="bg-blue-50 p-2 rounded-lg">
-                          <p className="text-xs text-blue-700 mb-1">📲 Telegram (20% OFF):</p>
-                          <div>
-                            <span className="text-2xl font-bold text-blue-700">{formatPrice(service.price_monthly * 0.8)}</span>
-                            <span className="text-gray-600 ml-2">/mes</span>
-                          </div>
-                          {service.price_annual > 0 && (
-                            <div className="mt-1 text-sm">
-                              <span className="text-blue-700 font-semibold">{formatPrice(service.price_annual * 0.8)}</span>
-                              <span className="text-gray-600">/año</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Descuento crypto */}
-                        {service.price_annual_crypto && (
-                          <div className="text-orange-600 font-semibold text-xs mt-2">
-                            🪙 {formatPrice(service.price_annual_crypto)}/año con BTC/ETH (25% OFF)
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    {/* Servicios normales de suscripción */}
-                    {service.billing_type === 'subscription' && !service.requires_messaging && service.price_monthly > 0 && (
-                      <div>
-                        <div>
-                          <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
-                          <span className="text-gray-600 ml-2">/mes</span>
-                        </div>
-                        {service.price_annual > 0 && (
-                          <div className="mt-2 text-sm">
-                            <div className="text-gray-600">
-                              <span className="font-semibold">{formatPrice(service.price_annual)}</span>/año
-                              <span className="text-green-600 ml-2">💰 2 meses gratis</span>
-                            </div>
+                            {service.price_annual > 0 && (
+                              <div>
+                                <span className="text-xs text-gray-600">Anual (10 meses)</span>
+                                <div>
+                                  <span className="text-lg font-bold text-emerald-700">{formatPrice(service.price_annual)}</span>
+                                  <span className="text-gray-600 text-xs ml-1">/año</span>
+                                </div>
+                                <p className="text-xs text-green-600">✓ Ahorras 2 meses</p>
+                              </div>
+                            )}
                             {service.price_annual_crypto && (
-                              <div className="text-orange-600 font-semibold mt-1">
-                                🪙 {formatPrice(service.price_annual_crypto)}/año con BTC/ETH (25% OFF)
+                              <div className="text-xs text-orange-600 font-semibold mt-1">
+                                🪙 Anual con BTC/ETH: {formatPrice(service.price_annual_crypto)}/año AHORRA 25%
                               </div>
                             )}
                           </div>
-                        )}
+                        </div>
+                        
+                        {/* Telegram */}
+                        <div className="bg-blue-50 rounded-lg p-3">
+                          <p className="text-sm font-bold text-blue-700 mb-1 flex items-center justify-between">
+                            <span>✈️ Telegram</span>
+                            <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">-20%</span>
+                          </p>
+                          <div className="space-y-1">
+                            <div>
+                              <span className="text-xs text-gray-600">Mensual</span>
+                              <div>
+                                <span className="text-2xl font-bold text-blue-700">{formatPrice(service.price_monthly_telegram || service.price_monthly * 0.8)}</span>
+                                <span className="text-gray-600 text-sm ml-1">/mes</span>
+                              </div>
+                            </div>
+                            {service.price_annual_telegram && (
+                              <div>
+                                <span className="text-xs text-gray-600">Anual (10 meses)</span>
+                                <div>
+                                  <span className="text-lg font-bold text-blue-700">{formatPrice(service.price_annual_telegram)}</span>
+                                  <span className="text-gray-600 text-xs ml-1">/año</span>
+                                </div>
+                                <p className="text-xs text-green-600">✓ Ahorras 2 meses</p>
+                              </div>
+                            )}
+                            {service.price_annual_crypto_telegram && (
+                              <div className="text-xs text-orange-600 font-semibold mt-1">
+                                🪙 Anual con BTC/ETH: {formatPrice(service.price_annual_crypto_telegram)}/año-25%
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-xs text-blue-700 mt-2 font-semibold">⚡ Más estable: Telegram ofrece mayor fiabilidad en la entrega</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Servicios con Panel Web */}
+                    {service.platform === 'web_panel' && !service.status && (
+                      <div>
+                        <div className="bg-cyan-50 border-2 border-cyan-300 rounded-lg p-3 mb-3">
+                          <p className="text-cyan-700 font-bold text-sm">🖥️ ACCESO VÍA PANEL WEB</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Plan Mensual</p>
+                            <div>
+                              <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                              <span className="text-gray-600 ml-2">/mes</span>
+                            </div>
+                          </div>
+                          {service.price_annual > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-600 mb-1">Plan Anual (10 meses)</p>
+                              <div>
+                                <span className="text-2xl font-bold text-emerald-700">{formatPrice(service.price_annual)}</span>
+                                <span className="text-gray-600 ml-2">/año</span>
+                              </div>
+                              <p className="text-xs text-green-600">✓ Ahorras 2 meses</p>
+                            </div>
+                          )}
+                          {service.price_annual_crypto && (
+                            <div className="text-sm text-orange-600 font-semibold mt-2">
+                              🪙 Anual con BTC/ETH: {formatPrice(service.price_annual_crypto)}/año AHORRA 25%
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-cyan-700 mt-3 font-semibold">✨ Dashboard Personalizado: Gestiona todo desde tu área de cliente</p>
+                      </div>
+                    )}
+                    
+                    {/* Servicios próximamente */}
+                    {service.status === 'coming_soon' && (
+                      <div className="text-center py-4">
+                        <p className="text-gray-600 font-semibold">Precios disponibles próximamente</p>
                       </div>
                     )}
                   </div>
                   
                   {/* Features */}
-                  <div className="space-y-1 mb-6">
-                    {service.features && service.features.slice(0, 4).map((feature, fidx) => (
-                      <div key={fidx} className="flex items-start text-xs text-gray-700">
-                        <span className="text-green-500 mr-2">✓</span>
-                        <span>{feature}</span>
+                  {service.features && service.features.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-emerald-700 mb-2">✨ Incluye:</p>
+                      <div className="space-y-1">
+                        {service.features.slice(0, 6).map((feature, fidx) => (
+                          <div key={fidx} className="flex items-start text-xs text-gray-700">
+                            <span className="text-green-500 mr-2">✓</span>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                   
                   {/* Button */}
                   <button 
@@ -384,7 +449,7 @@ const LandingPage = ({ services }) => {
                         : 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800'
                     }`}
                   >
-                    {service.status === 'coming_soon' ? 'Próximamente' : (isLoggedIn ? 'Ir al Dashboard' : 'Suscribirse')}
+                    {service.status === 'coming_soon' ? 'Próximamente' : 'Suscribirse'}
                   </button>
                 </div>
               ))}

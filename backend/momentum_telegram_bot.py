@@ -12,7 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from momentum_service import MomentumPredictorService
 
 # Configuración
-BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', os.environ.get('CRYPTO_BOTS_TOKEN'))
+BOT_TOKEN = os.environ.get('MOMENTUM_BOT_TOKEN', os.environ.get('TELEGRAM_BOT_TOKEN'))
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/guarani_appstore')
 
 # Servicio

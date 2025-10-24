@@ -344,7 +344,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Momentum Predictor IA - Fase 2: Lógica Completa"
+    - "CryptoShield IA - Fase 1: Integración y Lógica MOCK"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

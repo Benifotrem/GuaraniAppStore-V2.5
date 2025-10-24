@@ -489,10 +489,10 @@ const LandingPage = ({ services }) => {
                   <button 
                     onClick={() => service.status !== 'coming_soon' && (isLoggedIn ? navigate('/dashboard') : setShowAuth(true))}
                     disabled={service.status === 'coming_soon'}
-                    className={`w-full py-3 px-4 rounded-lg font-bold transition ${
+                    className={`w-full py-3 px-4 rounded-xl font-bold transition ${
                       service.status === 'coming_soon' 
                         ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white'
                     }`}
                   >
                     {service.status === 'coming_soon' ? 'Próximamente' : 'Suscribirse'}

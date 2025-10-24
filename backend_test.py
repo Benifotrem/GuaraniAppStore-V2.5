@@ -26,6 +26,10 @@ class GuaraniBackendTester:
         self.test_article_slug = None
         self.initial_views = 0
         
+        # Momentum Predictor test data
+        self.test_symbols = ['BTC', 'ETH', 'SOL']
+        self.generated_signals = []
+        
     def log_test(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
         """Log test results"""
         result = {

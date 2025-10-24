@@ -47,6 +47,7 @@ class SignalResponse(BaseModel):
     predicted_at: str
     model_version: str
     is_mock: bool
+    indicators: Optional[dict] = None
 
 class SignalHistory(BaseModel):
     symbol: str

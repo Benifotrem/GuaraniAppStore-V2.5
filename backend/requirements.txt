@@ -141,3 +141,10 @@ outscraper==3.1.2
 apify-client==1.8.2
 redis==5.2.1
 apscheduler==3.10.4
+feedparser==6.0.12
+praw==7.8.1
+prawcore==2.4.0
+python-dateutil==2.9.0.post0
+torch==2.9.0
+transformers==4.57.1
+tweepy==4.16.0

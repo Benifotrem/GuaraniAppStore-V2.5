@@ -2979,6 +2979,17 @@ async def get_google_oauth_status(current_user: User = Depends(get_current_user)
         }
 
 
+# ============================================
+# PULSE IA ENDPOINTS
+# ============================================
+try:
+    from pulse_api import router as pulse_router
+    app.include_router(pulse_router)
+    logger.info("✅ Pulse IA endpoints loaded")
+except Exception as e:
+    logger.warning(f"⚠️ Pulse IA endpoints not loaded: {e}")
+
+
 # Include router in app
 app.include_router(api_router)
 

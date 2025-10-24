@@ -240,14 +240,17 @@ class MomentumPredictorService:
                 ]
             else:
                 signal = 'HOLD'
-                confidence_base = 60
+                # For HOLD, confidence varies based on how close the scores are
+                score_diff = abs(buy_score - sell_score)
+                confidence_base = max(50, 65 - score_diff * 5)  # Lower confidence when scores are closer
                 probabilities = [0.20, 0.60, 0.20]
             
             # Normalizar probabilidades para que sumen 1
             prob_sum = sum(probabilities)
             probabilities = [p / prob_sum for p in probabilities]
             
-            confidence = max(probabilities) * 100
+            # Use confidence_base instead of max(probabilities) for more dynamic calculation
+            confidence = confidence_base
             
             # Calcular niveles
             levels = self._calculate_trading_levels(signal, current_price, confidence)

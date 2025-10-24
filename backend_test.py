@@ -30,6 +30,9 @@ class GuaraniBackendTester:
         self.test_symbols = ['BTC', 'ETH', 'SOL']
         self.generated_signals = []
         
+        # Expected services count
+        self.expected_services_count = 14  # Updated for Momentum Predictor services
+        
     def log_test(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
         """Log test results"""
         result = {

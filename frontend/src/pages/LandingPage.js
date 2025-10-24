@@ -155,12 +155,32 @@ const LandingPage = ({ services }) => {
               Desde contabilizar facturas a partir de una foto o pdf, pasando por prospección de leads, hasta agentes de ventas 24/7. Transforma tu negocio con automatización avanzada.
             </p>
             
+            {/* Banner Trial Gratuito */}
+            <div className="glass-strong rounded-2xl p-6 max-w-2xl mx-auto mb-4 border-4 border-green-400 bg-gradient-to-r from-green-50 to-emerald-50">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-3xl mr-2">🎁</span>
+                <p className="text-emerald-900 font-bold text-2xl">
+                  ¡Trial Gratuito de 7 Días!
+                </p>
+              </div>
+              <p className="text-gray-800 text-base">
+                Prueba <strong>cualquier servicio sin tarjeta de crédito</strong>
+              </p>
+              <p className="text-green-700 text-sm mt-2 font-semibold">
+                ✓ Sin compromiso &nbsp;|&nbsp; ✓ Cancela cuando quieras &nbsp;|&nbsp; ✓ Full acceso
+              </p>
+            </div>
+            
+            {/* Banner Crypto */}
             <div className="glass-strong rounded-2xl p-4 max-w-2xl mx-auto mb-8 border-2 border-yellow-400 bg-yellow-50">
               <p className="text-emerald-900 font-semibold text-lg">
                 ⚡ Servicios para inversores en criptomonedas
               </p>
               <p className="text-gray-700 text-sm mt-1">
                 Regístrate hoy y obtén nuestro <strong>Escáner de Fraude CryptoShield IA GRATIS... para siempre</strong>
+              </p>
+              <p className="text-orange-600 text-xs mt-2 font-semibold">
+                🪙 25% OFF en planes anuales pagando con BTC/ETH
               </p>
             </div>
 

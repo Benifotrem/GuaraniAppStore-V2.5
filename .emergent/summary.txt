@@ -1,52 +1,91 @@
 <analysis>
-The AI engineer's work focused on two main areas: implementing a comprehensive Automated Blog System and resolving various critical user-reported issues and bugs across the application. The blog system involved extensive backend development (database models, FastAPI endpoints for generation, approval, and statistics) and a detailed frontend (Admin Panel, article generation form, preview, and public blog display with specific styling and content formatting). Iterative debugging resolved persistent CSS loading, backend syntax errors, and ensured correct rendering of AI-generated content (floating images, rich text, author signatures, Bitfinex promotion). Concurrently, UX improvements like session persistence, Delete Account, and Cancel Subscription features were implemented. A Google OAuth  error remains pending external user action. The immediate ongoing task is verifying AI-generated images using the newly configured  model.
+The AI engineer's work spanned several critical areas: the completion and refinement of an Automated Blog System, iterative bug fixing, resolution of a major security vulnerability, and the initial implementation of new AI-driven crypto services. Key accomplishments include the successful integration and verification of  for blog image generation, comprehensive UI/UX improvements for blog display, and dynamic adaptation of backend services to operate robustly with MongoDB as a fallback when PostgreSQL was unavailable. A significant challenge involved addressing Git security failures due to exposed credentials, which was resolved by guiding the user through local Git history cleanup and ensuring  protection. The trajectory culminated in the structured implementation of the **Pulse IA** crypto sentiment analysis service, including its data scrapers, sentiment model, API, and Telegram bot integration, all while maintaining the flexible database approach. The next task was to scaffold the **Momentum Predictor IA** architecture.
 </analysis>
 
 <product_requirements>
-The GuaraniAppStore V2.5 Pro is a full-stack application with a FastAPI backend, React frontend, and PostgreSQL database, featuring a pixel-pixel landing page, JWT/OAuth authentication, and 11 AI-driven business services. A critical requirement is an automated blog system capable of generating 7 SEO-optimized articles weekly (6 agent, 1 CEO), with AI-generated images and an admin approval workflow, using APScheduler and PostgreSQL. This expanded to include on-demand article generation via an Admin Panel, specific UI/UX designs, and detailed content formatting such as rich text, floating images, author signatures, and a Bitfinex affiliate call-to-action. Additional requirements encompassed resolving session closure issues, adding a Delete Account button in the user profile, and implementing a Cancel Subscription system in the transactions section.
+The GuaraniAppStore V2.5 Pro is a full-stack application (FastAPI, React, PostgreSQL) offering 11 AI-driven business services, robust authentication, and a pixel-perfect landing page. A core requirement was an automated blog system to generate 7 SEO-optimized articles weekly (6 agent, 1 CEO), with AI-generated images and an admin approval workflow using APScheduler and PostgreSQL. This expanded to include on-demand article generation via an Admin Panel, specific rich-text formatting (floating images, author signatures, Bitfinex promotion), and a responsive UI. Additional requests included resolving session closure, adding Delete Account and Cancel Subscription features.
+
+Later, the user requested the implementation of three complete crypto AI services:
+1.  **Momentum Predictor IA**: LSTM-based trading signal prediction (BUY/SELL/HOLD), technical analysis, Telegram bot, REST API, and dashboard using Python (TensorFlow/Keras, CCXT, TA-Lib), FastAPI, React, and PostgreSQL.
+2.  **CryptoShield IA**: Autoencoder-based fraud and scam detection on blockchain transactions, real-time alerts, wallet/contract analysis, Telegram bot, and REST API using Python (TensorFlow/Keras, web3.py, etherscan-python), FastAPI, and PostgreSQL.
+3.  **Pulse IA**: Market sentiment analysis from 15+ RSS feeds, Twitter, and Reddit, with sentiment scores, trend detection, FOMO/FUD detection, Telegram bot, REST API, and dashboard using Python (Transformers/BERT, feedparser, tweepy, praw), FastAPI, React, and PostgreSQL.
+
+These new services require specific external API keys (Telegram Bot, Etherscan, Twitter, Reddit) and PostgreSQL for data storage, though an adaptation for MongoDB was implemented for immediate functionality due to PostgreSQL availability issues.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack:** FastAPI (Python), React (JavaScript), PostgreSQL (SQLAlchemy).
--   **AI/LLMs:** OpenRouter API (DeepSeek R1T2 Chimera, OpenAI GPT-5 Image Mini, Gemini 2.5 Flash Image).
--   **Scheduling:** APScheduler.
--   **Authentication:** JWT, Google OAuth 2.0.
--   **UI:** React Router, Ant Design, Tailwind CSS,  with .
+-   **Full-stack:** FastAPI (Python), React (JavaScript), PostgreSQL (SQLAlchemy), MongoDB (Motor).
+-   **AI/LLMs:** OpenRouter API (DeepSeek R1T2 Chimera, OpenAI GPT-5 Image Mini), TensorFlow/Keras (LSTM, Autoencoder), Transformers/BERT (NLP).
+-   **Scheduling:** APScheduler, cron jobs.
+-   **APIs:** CCXT (crypto exchanges), Etherscan, Twitter API v2, Reddit API (PRAW), Telegram Bot API.
+-   **UI/UX:** React Router, Ant Design, Tailwind CSS, .
+-   **Data Processing:** Pandas, NumPy, Scikit-learn, TA-Lib.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Updated to define the  SQLAlchemy ORM model, including extensive fields for content, author, SEO metadata, publishing status, and a detailed approval workflow (e.g., , ).
--   ****: Expanded with Pydantic models (, ) for robust data validation and serialization, crucial for the new blog system's API.
--   ****: This new service handles the core logic for AI-driven article and image generation using OpenRouter. It manages prompt engineering for rich text formatting, author signatures, Bitfinex promotion, dynamic image insertion based on article content, and agent detection.
--   ****: A new service using APScheduler to automate the generation of scheduled blog articles, invoking .
--   ****: Significantly refactored to integrate new FastAPI endpoints for the blog's administration (e.g., , , ). It also manages application startup/shutdown events to control the blog scheduler and includes new endpoints for user account deletion and subscription cancellation. Fixes were made to handle database session context correctly.
--   ****: Modified to expose both asynchronous () and synchronous () session factories, accommodating various database interaction patterns required by the backend.
--   ****: A newly created utility file consolidating all API interactions related to the blog system from the frontend (e.g., , , ).
--   ****: Modified to incorporate a Blog navigation tab, which dynamically renders the  component, enabling administrative access to the blog features.
--   ****: A new page serving as the main administrative dashboard for the blog. It displays blog statistics, lists articles awaiting approval, and hosts the .
--   ****: A dedicated page for managing pending articles, allowing administrators to review, preview, and either approve or reject generated content.
--   ****: Completely overhauled to display public blog articles. It now features a responsive 4-column grid layout, enhanced visual styling, and utilizes  with  to correctly render rich, AI-generated content including floating images and author signatures.
--   ****: Rewritten to ensure proper loading and application of styles for the public blog, implementing the grid layout, card designs, hover effects, and responsive adjustments for a professional appearance.
--   ****: A new React component providing a form for administrators to generate articles on demand, allowing specification of search queries, keywords, agent, tone, and length.
--   ****: A new component displaying a concise summary of an article in the approval queue, including title, author, request details, and action buttons.
--   ****: A modal component that presents a full, formatted preview of a generated article, including metadata and rendered markdown content, before final approval.
--   ****: Updated to remove automatic redirection to the dashboard for logged-in users, ensuring they can access the landing page. It dynamically hides trial-related call-to-action buttons when a user is authenticated.
--   ****: Enhanced to include a Danger Zone section within the user profile tab, featuring a Delete Account button. The transactions tab was also modified to include a Cancel Subscription button for active subscriptions.
--   ****: Modified to dynamically change the Iniciar Sesión button to 🎯 Ir al Dashboard when a user is logged in, improving navigation consistency.
+
+
+-   ****: Central for environment variables; frequently updated to obfuscate sensitive API keys (Twitter, Reddit, Emergent LLM, OpenAI, Anthropic, Google, Apify, Pagopar, Etherscan, Outscraper). Crucially protected by .
+-   ****: Modified to explicitly ignore , , and  to prevent future secret exposures. It already includes .
+-   ****: Heavily modified to handle dual database logic (PostgreSQL primary, MongoDB fallback) for login and core services, preventing startup failures when PostgreSQL is unavailable. Also integrated .
+-   ****: Updated  and  Pydantic models to include  and other necessary fields for correct data serialization, resolving API errors.
+-   ****: Script used to reset and initialize MongoDB with the correct set of application services, resolving inconsistencies in service data.
+-   ****: New script created to fetch and update service prices in MongoDB from a specified GitHub repository, ensuring data synchronization.
+-   ****: Confirmed to be configured with  for AI image generation.
+-   ****: Imports new .
+-   ****: New file created to house custom CSS styles for the admin panel, specifically targeting Ant Design dropdowns.
+-   ****: Modified to apply inline and custom class-based CSS styles to Ant Design  components to ensure text visibility in agent dropdowns.
+-   ****: Modified to include global CSS styles to ensure all Ant Design dropdowns within the application display black text, addressing a persistent UI visibility issue.
+
+**New files for Pulse IA:**
+-   ****: Likely for general configurations or settings for Pulse IA.
+-   ****: Handles fetching articles from various RSS feeds for sentiment analysis.
+-   ****: Manages fetching tweets from Twitter API for sentiment analysis.
+-   ****: Scrapes posts from Reddit for sentiment analysis.
+-   ****: Implements BERT-based sentiment analysis and FOMO/FUD detection.
+-   ****: Orchestrates data collection from scrapers, runs sentiment analysis, and aggregates results.
+-   ****: Handles Telegram bot interactions for Pulse IA, providing sentiment analysis on demand.
+-   ****: Defines FastAPI endpoints for Pulse IA, allowing external access to its sentiment analysis features.
+-   **🤖 Iniciando Pulse IA Telegram Bot...
+🚀 Inicializando Pulse IA Service...
+🤖 Cargando modelo FinBERT...
+✅ Sentiment Analyzer cargado (device: cpu)
+✅ Pulse IA Service listo
+❌ ERROR: TELEGRAM_BOT_TOKEN no configurado
+   Configura la variable de entorno TELEGRAM_BOT_TOKEN**: Script to easily start the Pulse IA Telegram bot.
+-   ****: Documentation for the Pulse IA service.
+
+**New stub files for Momentum Predictor IA (architecture only):**
+-   ****: Placeholder for LSTM model architecture.
+-   ****: Placeholder for data preprocessing logic.
+-   ****: Placeholder for the core prediction service.
+-   ****: Placeholder for FastAPI endpoints for Momentum Predictor.
+-   ****: Placeholder for Telegram bot interactions.
 </code_architecture>
 
 <pending_tasks>
 -   Troubleshoot and resolve the Google OAuth  error (requires user action on Google Cloud Console).
--   Confirm the successful generation and appearance of images using the  model, including proper image URL extraction and handling.
--   Integrate Outscraper and Apify external APIs.
--   Implement full Google APIs (Calendar, Sheets, Blogger) using OAuth 2.0.
+-   Confirm the successful generation of images using  with a *real AI-generated article* (manual test was done).
+-   Implement remaining Google APIs (Calendar, Sheets, Blogger) using OAuth 2.0.
+-   Complete implementation of **CryptoShield IA**.
+-   Complete implementation of **Momentum Predictor IA** (including training the model and integrating it fully).
+-   Address  warning (low priority).
+-   Implement the frontend dashboard for Pulse IA, CryptoShield IA, and Momentum Predictor IA.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing the user's explicit request to update the AI image generation model for the automated blog system. The user requested to use  via OpenRouter. The  file has been updated to specify this model for image generation, and the backend has been restarted. A new article generation process has been initiated to test this change, and the system is currently in the process of generating this article. This work follows extensive refinements to the blog system's UI/UX, content formatting (titles, paragraphs, floating images, author signatures), and functionality, ensuring articles appear correctly on the public blog page and within the admin panel, as well as several critical bug fixes related to user session persistence and account management features.
+Immediately before this summary request, the AI engineer completed the architectural setup for the **Pulse IA** crypto sentiment analysis service. This included creating all necessary backend Python files for RSS, Twitter, and Reddit scrapers (, , ), the core sentiment analysis () and service logic (), its dedicated Telegram bot (), and a REST API (). These components were integrated into the main  and tested for basic functionality. The system successfully performed RSS scraping and sentiment analysis, and its API health check endpoint returned healthy. This work was done by adapting to a MongoDB-only environment for these services due to PostgreSQL's recurring unavailability.
+
+Concurrently, there was a critical security incident where sensitive API keys were found in Git history. The AI engineer initiated a multi-step remediation process:
+1.  Obfuscated all identified keys in  and .
+2.  Updated  to explicitly prevent , , and other potential secret files from being tracked.
+3.  Executed a local Git history cleanup by reinitializing the repository and adding all files to a fresh commit to ensure no historical commits contained secrets.
+4.  Provided the user with a detailed explanation of the problem and the steps taken.
+
+The last explicit request from the user was to proceed with the **Momentum Predictor IA**, but only to create its architecture without training the model. The AI engineer has initiated this by creating the placeholder files for its LSTM model, preprocessor, prediction service, API, and Telegram bot.
 </current_work>
 
 <optional_next_step>
-Verify the output of the new article generation to confirm that images are now successfully generated and appear correctly using the  model, as per the user's request: Utiliza para generar las imagenes de los articulos openai/gpt-5-image-mini a traves de openroute, haz el cambio y genera un nuevo articulo.
+Integrate the newly created Momentum Predictor IA architecture into the main backend server and install its required Python dependencies.
 </optional_next_step>

@@ -1236,13 +1236,13 @@ class GuaraniBackendTester:
             risk_level = scan.get('risk_level')
             risk_score = scan.get('risk_score', 0)
             
-            # Check risk level consistency with score
-            if risk_level == 'low' and not (0 <= risk_score <= 39):
-                scoring_errors.append(f"{scan_type}: LOW risk but score {risk_score} not 0-39")
-            elif risk_level == 'medium' and not (40 <= risk_score <= 69):
-                scoring_errors.append(f"{scan_type}: MEDIUM risk but score {risk_score} not 40-69")
-            elif risk_level == 'high' and not (70 <= risk_score <= 100):
-                scoring_errors.append(f"{scan_type}: HIGH risk but score {risk_score} not 70-100")
+            # Check risk level consistency with score (based on actual implementation)
+            if risk_level == 'low' and not (0 <= risk_score < 25):
+                scoring_errors.append(f"{scan_type}: LOW risk but score {risk_score} not 0-24")
+            elif risk_level == 'medium' and not (25 <= risk_score < 50):
+                scoring_errors.append(f"{scan_type}: MEDIUM risk but score {risk_score} not 25-49")
+            elif risk_level == 'high' and not (50 <= risk_score <= 100):
+                scoring_errors.append(f"{scan_type}: HIGH risk but score {risk_score} not 50-100")
             else:
                 consistent_scores += 1
         

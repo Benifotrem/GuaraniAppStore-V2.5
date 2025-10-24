@@ -916,22 +916,39 @@ class GuaraniBackendTester:
                     print(f"   • {result['test']}: {result['details']}")
             print()
         
-        # Overall assessment for Momentum Predictor
+        # Overall assessment for Momentum Predictor Fase 2
         momentum_working = momentum_health and momentum_signals and momentum_history
+        fase2_features_working = signal_variety and confidence_variation and scoring_logic and indicators_realism
         core_working = countries_success and services_success and backend_success
         
         print("🏆 RESULTADO FINAL:")
-        if momentum_working and core_working:
-            print("🎉 SUCCESS: MOMENTUM PREDICTOR IA FASE 1 COMPLETAMENTE FUNCIONAL!")
+        if momentum_working and fase2_features_working and core_working:
+            print("🎉 SUCCESS: MOMENTUM PREDICTOR IA FASE 2 COMPLETAMENTE FUNCIONAL!")
             print("   ✅ Todos los endpoints de Momentum Predictor funcionando")
+            print("   ✅ Sistema de análisis técnico completo (20 indicadores)")
+            print("   ✅ Sistema de scoring con 8 puntos máximo operativo")
+            print("   ✅ Confianza calculada dinámicamente")
+            print("   ✅ Campo 'indicators' incluido en respuesta API")
+            print("   ✅ Model version MOCK_v2_Technical_Analysis")
             print("   ✅ Integración con Kraken exchange operativa")
-            print("   ✅ Señales MOCK generándose correctamente")
             print("   ✅ Almacenamiento en MongoDB funcionando")
             print("   ✅ Sistema backend estable")
-        elif momentum_working:
-            print("🟡 PARTIAL SUCCESS: Momentum Predictor funcionando, problemas en sistema core")
-            print("   ✅ Momentum Predictor IA operativo")
+        elif momentum_working and fase2_features_working:
+            print("🟡 PARTIAL SUCCESS: Momentum Predictor Fase 2 funcionando, problemas en sistema core")
+            print("   ✅ Momentum Predictor IA Fase 2 completamente operativo")
+            print("   ✅ Análisis técnico y scoring system funcionando")
             print("   ❌ Algunos endpoints del sistema core fallan")
+        elif momentum_working:
+            print("🟠 PARTIAL SUCCESS: Endpoints funcionando pero faltan características Fase 2")
+            print("   ✅ Endpoints básicos de Momentum Predictor funcionando")
+            if not signal_variety:
+                print("   ❌ Señales no varían suficientemente")
+            if not confidence_variation:
+                print("   ❌ Confianza no varía dinámicamente")
+            if not scoring_logic:
+                print("   ❌ Lógica de scoring system incorrecta")
+            if not indicators_realism:
+                print("   ❌ Indicadores técnicos no realistas")
         else:
             print("🚨 FAILURE: Problemas en Momentum Predictor IA!")
             if not momentum_health:
@@ -943,12 +960,16 @@ class GuaraniBackendTester:
         
         print()
         print("📋 PRÓXIMOS PASOS:")
-        if momentum_working:
-            print("   • FASE 1 COMPLETADA - Listo para Fase 2")
-            print("   • Implementar lógica completa de preprocesamiento")
-            print("   • Definir arquitectura LSTM (sin entrenar modelo)")
-            print("   • Desarrollar bot de Telegram para señales")
-            print("   • Comandos: /signal, /history, /stats")
+        if momentum_working and fase2_features_working:
+            print("   • FASE 2 COMPLETADA - Sistema de análisis técnico completo")
+            print("   • Listo para entrenar modelo LSTM real con datos históricos")
+            print("   • Bot de Telegram ya implementado y listo")
+            print("   • Considerar implementar CryptoShield IA como siguiente fase")
+        elif momentum_working:
+            print("   • Revisar implementación de indicadores técnicos en momentum_service.py")
+            print("   • Verificar sistema de scoring en _generate_mock_signal()")
+            print("   • Comprobar cálculo dinámico de confianza")
+            print("   • Validar campo 'indicators' en respuesta API")
         else:
             print("   • Revisar logs del backend: tail -n 100 /var/log/supervisor/backend.*.log")
             print("   • Verificar integración de momentum_api.py en server.py")

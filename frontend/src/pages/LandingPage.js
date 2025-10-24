@@ -219,7 +219,7 @@ const LandingPage = ({ services }) => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.map((service, idx) => (
-                <div key={service.id} className="service-card glass-strong border-2 border-white/40 hover:border-emerald-400 rounded-2xl p-6 relative overflow-hidden">
+                <div key={service.id} className={`service-card glass-strong border-2 border-white/40 hover:border-emerald-400 rounded-2xl p-6 relative overflow-hidden ${service.status === 'coming_soon' ? 'opacity-75' : ''}`}>
                   {service.status === 'coming_soon' && (
                     <div className="absolute top-12 -right-12 bg-yellow-400 text-black px-16 py-2 transform rotate-45 shadow-lg z-10">
                       <span className="font-bold text-sm">PRÓXIMAMENTE</span>
@@ -231,7 +231,7 @@ const LandingPage = ({ services }) => {
                   
                   <div className="mb-4">
                     {/* Consultoría Técnica - Pago único */}
-                    {service.slug === 'consultoria-tecnica' && (
+                    {service.billing_type === 'one_time' && (
                       <div>
                         <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-3 mb-3">
                           <p className="text-purple-700 font-bold text-sm">💎 Pago Único - No Suscripción</p>
@@ -241,43 +241,134 @@ const LandingPage = ({ services }) => {
                           <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
                           <span className="text-gray-600 ml-2">pago único</span>
                         </div>
-                        <div className="text-orange-600 font-semibold text-sm mt-2">
-                          🪙 {formatPriceWithDiscount(service.price_monthly)} con BTC/ETH (25% OFF)
-                        </div>
+                        {service.price_crypto && (
+                          <div className="text-orange-600 font-semibold text-sm mt-2">
+                            🪙 {formatPrice(service.price_crypto)} con BTC/ETH (25% OFF)
+                          </div>
+                        )}
                       </div>
                     )}
                     
                     {/* Prospección Comercial - Sistema por paquetes */}
-                    {service.slug === 'prospeccion-comercial' && (
+                    {service.billing_type === 'freemium_packs' && service.packs && (
                       <div>
                         <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-3 mb-3">
                           <p className="text-blue-700 font-bold text-sm">📦 Sistema por Paquetes de Leads</p>
                           <p className="text-blue-600 text-xs mt-1">🎁 Prueba GRATIS con 5 leads</p>
                           <p className="text-blue-600 text-xs mt-1">⏰ Los usos no caducan</p>
                         </div>
-                        <div className="text-gray-600 text-center font-semibold">
-                          Precios disponibles próximamente
+                        <div className="space-y-2">
+                          {service.packs.map((pack, pidx) => (
+                            <div key={pidx} className={`border ${pack.popular ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'} rounded-lg p-2`}>
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-semibold text-gray-700">{pack.name}</span>
+                                {pack.popular && <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">Popular</span>}
+                              </div>
+                              <p className="text-xs text-gray-600">{pack.searches} búsquedas × {pack.leads_per_search} leads</p>
+                              <p className="text-lg font-bold text-emerald-700">{formatPrice(pack.price_gs)}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
                     
-                    {/* Otros servicios - Precio normal */}
-                    {service.slug !== 'consultoria-tecnica' && service.slug !== 'prospeccion-comercial' && (
-                      <>
-                        {service.price_monthly > 0 && (
+                    {/* Servicios con mensajería (WhatsApp/Telegram) */}
+                    {service.billing_type === 'subscription' && service.requires_messaging && (
+                      <div>
+                        <div className="bg-indigo-50 border-2 border-indigo-300 rounded-lg p-3 mb-3">
+                          <p className="text-indigo-700 font-bold text-sm">📱 WhatsApp o Telegram</p>
+                          <p className="text-indigo-600 text-xs mt-1">💰 20% descuento en Telegram</p>
+                        </div>
+                        
+                        {/* WhatsApp */}
+                        <div className="mb-3">
+                          <p className="text-xs text-gray-600 mb-1">📱 WhatsApp:</p>
                           <div>
-                            <div>
-                              <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
-                              <span className="text-gray-600 ml-2">/mes</span>
+                            <span className="text-2xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                            <span className="text-gray-600 ml-2">/mes</span>
+                          </div>
+                          {service.price_annual > 0 && (
+                            <div className="mt-1 text-sm">
+                              <span className="text-gray-600 font-semibold">{formatPrice(service.price_annual)}</span>
+                              <span className="text-gray-600">/año</span>
+                              <span className="text-green-600 ml-2">💰 2 meses gratis</span>
                             </div>
-                            {service.price_annual > 0 && (
-                              <div className="mt-2 text-sm">
-                                <div className="text-gray-600">
-                                  <span className="font-semibold">{formatPrice(service.price_annual)}</span>/año
-                                  <span className="text-green-600 ml-2">💰 2 meses gratis</span>
-                                </div>
-                                <div className="text-orange-600 font-semibold mt-1">
-                                  🪙 {formatPriceWithDiscount(service.price_annual)}/año con BTC/ETH (25% OFF)
+                          )}
+                        </div>
+                        
+                        {/* Telegram con descuento */}
+                        <div className="bg-blue-50 p-2 rounded-lg">
+                          <p className="text-xs text-blue-700 mb-1">📲 Telegram (20% OFF):</p>
+                          <div>
+                            <span className="text-2xl font-bold text-blue-700">{formatPrice(service.price_monthly * 0.8)}</span>
+                            <span className="text-gray-600 ml-2">/mes</span>
+                          </div>
+                          {service.price_annual > 0 && (
+                            <div className="mt-1 text-sm">
+                              <span className="text-blue-700 font-semibold">{formatPrice(service.price_annual * 0.8)}</span>
+                              <span className="text-gray-600">/año</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Descuento crypto */}
+                        {service.price_annual_crypto && (
+                          <div className="text-orange-600 font-semibold text-xs mt-2">
+                            🪙 {formatPrice(service.price_annual_crypto)}/año con BTC/ETH (25% OFF)
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Servicios normales de suscripción */}
+                    {service.billing_type === 'subscription' && !service.requires_messaging && service.price_monthly > 0 && (
+                      <div>
+                        <div>
+                          <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                          <span className="text-gray-600 ml-2">/mes</span>
+                        </div>
+                        {service.price_annual > 0 && (
+                          <div className="mt-2 text-sm">
+                            <div className="text-gray-600">
+                              <span className="font-semibold">{formatPrice(service.price_annual)}</span>/año
+                              <span className="text-green-600 ml-2">💰 2 meses gratis</span>
+                            </div>
+                            {service.price_annual_crypto && (
+                              <div className="text-orange-600 font-semibold mt-1">
+                                🪙 {formatPrice(service.price_annual_crypto)}/año con BTC/ETH (25% OFF)
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="space-y-1 mb-6">
+                    {service.features && service.features.slice(0, 4).map((feature, fidx) => (
+                      <div key={fidx} className="flex items-start text-xs text-gray-700">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Button */}
+                  <button 
+                    onClick={() => service.status !== 'coming_soon' && (isLoggedIn ? navigate('/dashboard') : setShowAuth(true))}
+                    disabled={service.status === 'coming_soon'}
+                    className={`w-full py-3 px-4 rounded-lg font-bold transition ${
+                      service.status === 'coming_soon' 
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800'
+                    }`}
+                  >
+                    {service.status === 'coming_soon' ? 'Próximamente' : (isLoggedIn ? 'Ir al Dashboard' : 'Suscribirse')}
+                  </button>
+                </div>
+              ))}
+            </div>
                                 </div>
                               </div>
                             )}

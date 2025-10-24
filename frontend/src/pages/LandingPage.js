@@ -263,30 +263,212 @@ const LandingPage = ({ services }) => {
                     </div>
                   )}
                   
-                  <div className="mb-4">
-                    {/* Pago único (Consultoría) */}
-                    {service.billing_type === 'one_time' && !service.status && (
-                      <div>
-                        <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-3 mb-3">
-                          <p className="text-purple-700 font-bold text-sm">💎 Pago Único - No Suscripción</p>
-                          <p className="text-purple-600 text-xs mt-1">⏰ No caduca - Usa bajo demanda</p>
-                        </div>
-                        <div className="mb-3">
-                          <p className="text-xs text-gray-600 mb-1">Precio Regular:</p>
-                          <div>
-                            <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_monthly)}</span>
+                  <div className="mb-6">
+                    {/* Si es freemium con packs */}
+                    {service.billing_type === 'freemium_packs' ? (
+                      <div className="mb-4">
+                        {/* Trial Gratuito */}
+                        <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-xl border-2 border-green-400 mb-3">
+                          <p className="text-xs text-green-800 mb-2 uppercase font-bold">🎁 Prueba Gratis</p>
+                          <div className="text-center mb-2">
+                            <span className="text-3xl font-bold text-green-700">5 Leads Incluidos</span>
                           </div>
+                          <div className="space-y-1 text-xs text-gray-700 mb-3">
+                            <p>✅ Sin tarjeta de crédito</p>
+                            <p>✅ 5 leads con datos completos</p>
+                            <p>✅ Mensajes Ice Breaker personalizados</p>
+                          </div>
+                          <p className="text-xs text-gray-600 text-center">
+                            Crea tu primera campaña GRATIS y descubre cómo obtenemos leads reales de Google Maps
+                          </p>
                         </div>
-                        {service.price_crypto && (
-                          <div className="bg-orange-50 p-2 rounded-lg">
-                            <p className="text-xs text-orange-700 mb-1">🪙 Paga con BTC/ETH:</p>
-                            <div>
-                              <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_crypto)}</span>
-                              <span className="text-orange-600 ml-2 text-sm font-semibold">-25%</span>
+                      </div>
+                    ) : service.billing_type === 'one_time' ? (
+                      /* Pago único (Consultoría) */
+                      <div className="mb-4">
+                        <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-4 rounded-xl border-2 border-purple-300">
+                          <p className="text-xs text-purple-700 mb-2 uppercase font-bold">💎 Pago Único - No Suscripción</p>
+                          <div className="mb-3">
+                            <p className="text-sm text-gray-600 mb-1">Precio Regular:</p>
+                            <span className="text-3xl font-bold text-purple-700">{formatPrice(service.price_monthly)}</span>
+                          </div>
+                          {service.price_crypto && service.price_crypto < service.price_monthly && (
+                            <div className="mt-3 p-3 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg border-2 border-orange-300">
+                              <p className="text-xs text-orange-800 font-bold mb-1">🪙 Paga con BTC/ETH:</p>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_crypto)}</span>
+                                <span className="bg-orange-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">-25%</span>
+                              </div>
+                            </div>
+                          )}
+                          {service.no_expiration && (
+                            <div className="mt-3 p-3 bg-white/80 rounded-lg">
+                              <p className="text-xs text-purple-700 font-bold mb-1">⏰ No Caduca</p>
+                              <p className="text-xs text-gray-700">Usa bajo demanda cuando lo necesites</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Suite Crypto - Plan anual únicamente */}
+                        {service.billing_period === 'annual_only' && (
+                          <div className="mb-4">
+                            <div className="bg-white p-4 rounded-lg">
+                              <div className="text-center mb-3">
+                                <span className="text-3xl font-bold text-emerald-700">{formatPrice(service.price_annual)}</span>
+                                <span className="text-gray-600 ml-2">/año</span>
+                              </div>
+                              <p className="text-xs text-gray-600 text-center mb-3">Plan anual - Acceso a los 3 servicios</p>
+                              {service.included_services && service.included_services.length > 0 && (
+                                <div className="mb-3 space-y-2">
+                                  {service.included_services.map((inc, iidx) => (
+                                    <div key={iidx} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                                      <span className="text-sm font-semibold text-gray-700">{inc.name}</span>
+                                      {inc.status === 'GRATIS' && (
+                                        <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">GRATIS</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {service.price_annual_crypto && (
+                                <div className="p-3 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg border-2 border-orange-300">
+                                  <div className="text-center">
+                                    <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_annual_crypto)}</span>
+                                    <span className="text-gray-600 ml-1 text-sm">con BTC/ETH</span>
+                                    <span className="text-orange-600 ml-2 text-sm font-semibold">(25% OFF)</span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
-                      </div>
+                        
+                        {/* Servicios CON mensajería (WhatsApp/Telegram) */}
+                        {service.requires_messaging && service.billing_period !== 'annual_only' && (
+                          <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border-2 border-blue-300">
+                            <p className="text-xs text-blue-800 font-bold mb-2">📱 Precios por Plataforma</p>
+                            
+                            {/* WhatsApp - Precio Base */}
+                            <div className="bg-white p-3 rounded-lg mb-3">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-lg">💚</span>
+                                <span className="font-bold text-green-700">WhatsApp</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="text-center p-3 bg-green-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Mensual</p>
+                                  <p className="text-lg font-bold text-green-700 mb-1">{formatPrice(service.price_monthly)}</p>
+                                  <p className="text-sm text-gray-500">/mes</p>
+                                </div>
+                                <div className="text-center p-3 bg-green-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Anual (10 meses)</p>
+                                  <p className="text-lg font-bold text-green-700 mb-1">{formatPrice(service.price_annual)}</p>
+                                  <p className="text-sm text-gray-500">/año</p>
+                                  <p className="text-xs text-emerald-600 font-semibold mt-2">✓ Ahorras 2 meses</p>
+                                </div>
+                              </div>
+                              {service.price_annual_crypto && (
+                                <div className="mt-3 p-3 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg border-2 border-orange-300">
+                                  <p className="text-xs text-orange-800 font-bold mb-2">🪙 Anual con BTC/ETH:</p>
+                                  <div className="flex flex-col items-center gap-2">
+                                    <div className="flex items-baseline gap-2">
+                                      <span className="text-xl font-bold text-orange-700">{formatPrice(service.price_annual_crypto)}</span>
+                                      <span className="text-sm text-gray-500">/año</span>
+                                    </div>
+                                    <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">AHORRA 25%</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Telegram con descuento 20% */}
+                            <div className="bg-white p-3 rounded-lg border-2 border-blue-400">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">✈️</span>
+                                  <span className="font-bold text-blue-700">Telegram</span>
+                                </div>
+                                <span className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">-20%</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Mensual</p>
+                                  <p className="text-lg font-bold text-blue-700 mb-1">{formatPrice(service.price_monthly_telegram || Math.round(service.price_monthly * 0.8))}</p>
+                                  <p className="text-sm text-gray-500">/mes</p>
+                                </div>
+                                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Anual (10 meses)</p>
+                                  <p className="text-lg font-bold text-blue-700 mb-1">{formatPrice(service.price_annual_telegram || Math.round(service.price_annual * 0.8))}</p>
+                                  <p className="text-sm text-gray-500">/año</p>
+                                  <p className="text-xs text-emerald-600 font-semibold mt-2">✓ Ahorras 2 meses</p>
+                                </div>
+                              </div>
+                              {service.price_annual_crypto_telegram && (
+                                <div className="mt-3 p-2 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg border-2 border-orange-300">
+                                  <p className="text-xs text-orange-800 font-bold mb-1">🪙 Anual con BTC/ETH:</p>
+                                  <div className="flex items-baseline justify-center gap-2">
+                                    <span className="text-xl font-bold text-orange-700">{formatPrice(service.price_annual_crypto_telegram)}/año</span>
+                                    <span className="bg-orange-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">-25%</span>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-800">
+                                <strong>⚡ Más estable:</strong> Telegram ofrece mayor fiabilidad en la entrega
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Servicios SIN mensajería (solo Panel Web) */}
+                        {!service.requires_messaging && service.billing_period !== 'annual_only' && service.billing_type !== 'one_time' && service.billing_type !== 'freemium_packs' && (
+                          <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border-2 border-indigo-300">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-lg">🖥️</span>
+                              <p className="text-xs text-indigo-800 font-bold">ACCESO VÍA PANEL WEB</p>
+                            </div>
+                            
+                            <div className="bg-white p-4 rounded-lg">
+                              <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Plan Mensual</p>
+                                  <p className="text-xl font-bold text-indigo-700 mb-1">{formatPrice(service.price_monthly)}</p>
+                                  <p className="text-sm text-gray-500">/mes</p>
+                                </div>
+                                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                  <p className="text-xs text-gray-600 mb-2 font-semibold">Plan Anual (10 meses)</p>
+                                  <p className="text-xl font-bold text-indigo-700 mb-1">{formatPrice(service.price_annual)}</p>
+                                  <p className="text-sm text-gray-500">/año</p>
+                                  <p className="text-xs text-emerald-600 font-semibold mt-2">✓ Ahorras 2 meses</p>
+                                </div>
+                              </div>
+                              {service.price_annual_crypto && (
+                                <div className="mb-3 p-3 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg border-2 border-orange-300">
+                                  <p className="text-xs text-orange-800 font-bold mb-2">🪙 Anual con BTC/ETH:</p>
+                                  <div className="flex flex-col items-center gap-2">
+                                    <div className="flex items-baseline gap-2">
+                                      <span className="text-2xl font-bold text-orange-700">{formatPrice(service.price_annual_crypto)}</span>
+                                      <span className="text-sm text-gray-500">/año</span>
+                                    </div>
+                                    <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">AHORRA 25%</span>
+                                  </div>
+                                </div>
+                              )}
+                              {service.multi_purchase && (
+                                <div className="mt-3 p-3 bg-indigo-50 rounded-lg text-xs text-indigo-800 leading-relaxed">
+                                  <strong className="block mb-1">🔢 Múltiples instancias:</strong>
+                                  <span>Puedes contratar varias para diferentes proyectos</span>
+                                </div>
+                              )}
+                              <div className="mt-3 p-3 bg-indigo-50 rounded-lg text-xs text-indigo-800 leading-relaxed">
+                                <strong className="block mb-1">✨ Dashboard Personalizado:</strong>
+                                <span>Gestiona todo desde tu área de cliente</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                     
                     {/* Plan anual únicamente (Suite Crypto) */}

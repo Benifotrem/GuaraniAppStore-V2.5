@@ -155,15 +155,72 @@ async def init_services():
             "features": ["Multi-plataforma", "Respuestas inteligentes", "Integración CRM"]
         },
         {
-            "name": "Suite Crypto",
+            "name": "Pulse IA - Market Sentiment",
+            "slug": "pulse-ia",
+            "category": "Cripto",
+            "description": "Análisis de sentimiento del mercado cripto desde 15+ fuentes (RSS, Twitter, Reddit)",
+            "short_description": "Sentimiento de mercado con IA",
+            "price": 200000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 11,
+            "active": True,
+            "features": [
+                "Análisis de 15+ feeds RSS",
+                "Scraping de Twitter y Reddit",
+                "Detección FOMO/FUD con BERT",
+                "Telegram Bot integrado",
+                "Dashboard en tiempo real"
+            ]
+        },
+        {
+            "name": "Momentum Predictor IA",
+            "slug": "momentum-predictor",
+            "category": "Cripto",
+            "description": "Predicción de señales de trading (BUY/SELL/HOLD) con LSTM y análisis técnico",
+            "short_description": "Señales de trading con LSTM",
+            "price": 250000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 12,
+            "active": True,
+            "features": [
+                "Modelo LSTM para predicción",
+                "20 indicadores técnicos (RSI, MACD, BB)",
+                "Niveles de entrada/salida/stop loss",
+                "Telegram Bot con señales",
+                "Análisis de riesgo automático"
+            ]
+        },
+        {
+            "name": "CryptoShield IA",
+            "slug": "cryptoshield-ia",
+            "category": "Cripto",
+            "description": "Detección de fraude y scams en blockchain con Autoencoder",
+            "short_description": "Anti-fraude blockchain",
+            "price": 300000,
+            "currency": "PYG",
+            "duration_days": 30,
+            "order": 13,
+            "active": True,
+            "features": [
+                "Autoencoder para detección de fraude",
+                "Análisis de transacciones en tiempo real",
+                "Verificación de wallets/contratos",
+                "Alertas automáticas",
+                "Telegram Bot de seguridad"
+            ]
+        },
+        {
+            "name": "Suite Crypto IA Pro",
             "slug": "suite-crypto",
             "category": "Cripto",
-            "description": "Suite completa de 5 bots de Telegram para el ecosistema crypto",
+            "description": "Suite completa con Pulse, Momentum, CryptoShield + 2 bots asistentes",
             "short_description": "5 bots cripto en 1 suite",
             "price": 800000,
             "currency": "PYG",
             "duration_days": 30,
-            "order": 11,
+            "order": 14,
             "active": True,
             "features": [
                 "CryptoShield IA - Anti-fraude",

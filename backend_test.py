@@ -867,11 +867,26 @@ class GuaraniBackendTester:
         
         # Check critical verifications
         if self.generated_signals:
-            print("✅ VERIFICACIONES CRÍTICAS COMPLETADAS:")
+            print("✅ VERIFICACIONES CRÍTICAS FASE 2 COMPLETADAS:")
             sample_signal = self.generated_signals[0]
             print(f"   ✅ Precios reales desde Kraken: ${sample_signal.get('current_price', 0):,.2f}")
             print(f"   ✅ Señales guardadas en MongoDB: {len(self.generated_signals)} señales generadas")
             print(f"   ✅ Indicador is_mock = {sample_signal.get('is_mock', False)}")
+            
+            # Check model version
+            model_version = sample_signal.get('model_version', '')
+            print(f"   {'✅' if model_version == 'MOCK_v2_Technical_Analysis' else '❌'} Model version: {model_version}")
+            
+            # Check indicators field
+            indicators = sample_signal.get('indicators', {})
+            has_indicators = bool(indicators and 'rsi' in indicators and 'buy_score' in indicators)
+            print(f"   {'✅' if has_indicators else '❌'} Campo 'indicators' con RSI, MACD, scores: {'Presente' if has_indicators else 'Ausente'}")
+            
+            if has_indicators:
+                rsi = indicators.get('rsi', 0)
+                buy_score = indicators.get('buy_score', 0)
+                sell_score = indicators.get('sell_score', 0)
+                print(f"   ✅ Indicadores técnicos: RSI={rsi:.1f}, BUY_score={buy_score}, SELL_score={sell_score}")
             
             # Verify trading levels
             levels_valid = self.verify_trading_levels_calculation(sample_signal)
@@ -887,6 +902,11 @@ class GuaraniBackendTester:
             predicted_at = sample_signal.get('predicted_at', '')
             iso_format = 'T' in predicted_at and ('Z' in predicted_at or '+' in predicted_at)
             print(f"   {'✅' if iso_format else '❌'} Formato fecha ISO 8601 UTC: {'Correcto' if iso_format else 'Incorrecto'}")
+            
+            # Check confidence variation
+            confidences = [s.get('confidence', 60) for s in self.generated_signals]
+            confidence_varies = len(set(confidences)) > 1
+            print(f"   {'✅' if confidence_varies else '❌'} Confianza dinámica (no siempre 60%): {'Sí' if confidence_varies else 'No'}")
         
         if failed_tests > 0:
             print()

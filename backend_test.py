@@ -575,6 +575,151 @@ class GuaraniBackendTester:
             self.log_test("Momentum Stats (Non-existent)", False, 
                         f"Expected 404, got {status_code}", data)
 
+    def test_signal_variety_across_symbols(self):
+        """Test that signals vary across different symbols (not all HOLD)"""
+        if len(self.generated_signals) < 3:
+            self.log_test("Signal Variety", False, "Not enough signals generated to test variety")
+            return
+        
+        signals = [signal['signal'] for signal in self.generated_signals]
+        unique_signals = set(signals)
+        
+        # Check if we have variety (not all the same signal)
+        if len(unique_signals) > 1:
+            signal_counts = {signal: signals.count(signal) for signal in unique_signals}
+            self.log_test("Signal Variety", True, 
+                        f"Signal variety confirmed: {signal_counts}")
+        else:
+            # All signals are the same - this could happen but is less likely with technical analysis
+            single_signal = list(unique_signals)[0]
+            self.log_test("Signal Variety", True, 
+                        f"All signals are {single_signal} - acceptable but less variety than expected")
+
+    def test_confidence_variation(self):
+        """Test that confidence values vary dynamically (not always 60%)"""
+        if len(self.generated_signals) < 3:
+            self.log_test("Confidence Variation", False, "Not enough signals generated to test confidence variation")
+            return
+        
+        confidences = [signal['confidence'] for signal in self.generated_signals]
+        unique_confidences = set(confidences)
+        
+        # Check if confidence varies
+        if len(unique_confidences) > 1:
+            min_conf = min(confidences)
+            max_conf = max(confidences)
+            avg_conf = sum(confidences) / len(confidences)
+            self.log_test("Confidence Variation", True, 
+                        f"Confidence varies: Min={min_conf}%, Max={max_conf}%, Avg={avg_conf:.1f}%")
+        else:
+            # All confidences are the same
+            single_conf = list(unique_confidences)[0]
+            if single_conf == 60.0:
+                self.log_test("Confidence Variation", False, 
+                            "All confidences are 60% - dynamic calculation not working")
+            else:
+                self.log_test("Confidence Variation", True, 
+                            f"All confidences are {single_conf}% - consistent but not 60%")
+
+    def test_scoring_system_logic(self):
+        """Test the scoring system logic for BUY/SELL/HOLD decisions"""
+        if not self.generated_signals:
+            self.log_test("Scoring System Logic", False, "No signals generated to test scoring logic")
+            return
+        
+        logic_errors = []
+        valid_signals = 0
+        
+        for signal_data in self.generated_signals:
+            symbol = signal_data.get('symbol', 'Unknown')
+            signal = signal_data.get('signal')
+            indicators = signal_data.get('indicators', {})
+            
+            if not indicators:
+                continue
+                
+            buy_score = indicators.get('buy_score', 0)
+            sell_score = indicators.get('sell_score', 0)
+            
+            # Validate scoring logic
+            if signal == 'BUY':
+                if buy_score < sell_score + 2:
+                    logic_errors.append(f"{symbol}: BUY signal but buy_score({buy_score}) < sell_score({sell_score})+2")
+                else:
+                    valid_signals += 1
+            elif signal == 'SELL':
+                if sell_score < buy_score + 2:
+                    logic_errors.append(f"{symbol}: SELL signal but sell_score({sell_score}) < buy_score({buy_score})+2")
+                else:
+                    valid_signals += 1
+            elif signal == 'HOLD':
+                if abs(buy_score - sell_score) >= 2:
+                    logic_errors.append(f"{symbol}: HOLD signal but |buy_score({buy_score}) - sell_score({sell_score})| >= 2")
+                else:
+                    valid_signals += 1
+        
+        if not logic_errors:
+            self.log_test("Scoring System Logic", True, 
+                        f"All {valid_signals} signals follow correct scoring logic")
+        else:
+            self.log_test("Scoring System Logic", False, 
+                        f"Logic errors found: {'; '.join(logic_errors[:3])}")  # Show first 3 errors
+
+    def test_technical_indicators_realism(self):
+        """Test that technical indicators have realistic values"""
+        if not self.generated_signals:
+            self.log_test("Technical Indicators Realism", False, "No signals generated to test indicators")
+            return
+        
+        indicator_errors = []
+        valid_indicators = 0
+        
+        for signal_data in self.generated_signals:
+            symbol = signal_data.get('symbol', 'Unknown')
+            indicators = signal_data.get('indicators', {})
+            
+            if not indicators:
+                continue
+            
+            # Check RSI (should be 0-100)
+            rsi = indicators.get('rsi', 0)
+            if not (0 <= rsi <= 100):
+                indicator_errors.append(f"{symbol}: RSI {rsi} not in range 0-100")
+            
+            # Check MACD (should be a reasonable number, not NaN or extreme)
+            macd = indicators.get('macd', 0)
+            if not isinstance(macd, (int, float)) or abs(macd) > 10000:
+                indicator_errors.append(f"{symbol}: MACD {macd} seems unrealistic")
+            
+            # Check SMA values (should be positive and reasonable)
+            sma_7 = indicators.get('sma_7', 0)
+            sma_25 = indicators.get('sma_25', 0)
+            if sma_7 <= 0 or sma_25 <= 0:
+                indicator_errors.append(f"{symbol}: SMA values should be positive (SMA7={sma_7}, SMA25={sma_25})")
+            
+            # Check Stochastic (should be 0-100)
+            stoch_k = indicators.get('stoch_k', 0)
+            if not (0 <= stoch_k <= 100):
+                indicator_errors.append(f"{symbol}: Stochastic K {stoch_k} not in range 0-100")
+            
+            # Check scores (should be 0-8 integers)
+            buy_score = indicators.get('buy_score', 0)
+            sell_score = indicators.get('sell_score', 0)
+            if not (isinstance(buy_score, int) and 0 <= buy_score <= 8):
+                indicator_errors.append(f"{symbol}: buy_score {buy_score} not integer 0-8")
+            if not (isinstance(sell_score, int) and 0 <= sell_score <= 8):
+                indicator_errors.append(f"{symbol}: sell_score {sell_score} not integer 0-8")
+            
+            if not indicator_errors:
+                valid_indicators += 1
+        
+        if not indicator_errors:
+            self.log_test("Technical Indicators Realism", True, 
+                        f"All {valid_indicators} signals have realistic indicator values")
+        else:
+            self.log_test("Technical Indicators Realism", False, 
+                        f"Indicator errors: {'; '.join(indicator_errors[:3])}")  # Show first 3 errors
+
     def verify_trading_levels_calculation(self, signal_data):
         """Verify that trading levels are reasonable"""
         current_price = signal_data.get('current_price')

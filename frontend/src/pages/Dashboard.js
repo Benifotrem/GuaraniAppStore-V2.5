@@ -530,7 +530,34 @@ const Dashboard = () => {
                       </div>
 
                       {/* Service Access Buttons */}
-                      {(service.title.toLowerCase().includes('suite crypto') || service.title.toLowerCase().includes('cryptoshield')) ? (
+                      {(service.name?.toLowerCase().includes('suite crypto') || service.slug === 'suite-crypto') ? (
+                        <div className="space-y-3">
+                          <button
+                            onClick={() => navigate('/dashboard/suite-crypto')}
+                            className="w-full px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all flex items-center justify-center gap-2 font-semibold"
+                          >
+                            <span>🚀</span>
+                            <span>Abrir Suite Crypto</span>
+                          </button>
+                          <div className="bg-purple-50 rounded-lg p-3 text-xs">
+                            <p className="font-semibold text-purple-900 mb-2">✨ Incluye 3 Servicios:</p>
+                            <div className="space-y-1.5 text-purple-700">
+                              <div className="flex items-center gap-2">
+                                <span>🛡️</span>
+                                <span>CryptoShield IA (GRATIS)</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span>📊</span>
+                                <span>Pulse IA</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span>📈</span>
+                                <span>Momentum Predictor IA</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (service.title.toLowerCase().includes('suite crypto') || service.title.toLowerCase().includes('cryptoshield')) ? (
                         <div className="space-y-3">
                           <button
                             onClick={() => navigate('/services/crypto-suite')}

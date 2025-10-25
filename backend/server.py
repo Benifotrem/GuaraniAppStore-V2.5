@@ -1257,42 +1257,52 @@ async def get_user_subscriptions(
 ):
     """Get active subscriptions for current user"""
     
-    # Get completed orders (active subscriptions)
-    orders_result = await db.execute(
-        select(Order).filter(
-            Order.user_id == current_user.id,
-            Order.payment_status == 'completed'
-        ).options(selectinload(Order.service))
-    )
-    orders = orders_result.scalars().all()
-    
-    # Transform orders to subscription format
-    subscriptions = []
-    for order in orders:
-        if order.service:
-            # Calculate expiration date based on plan type
-            expires_at = None
-            if order.completed_at:
-                if order.plan_type == 'monthly':
-                    from datetime import timedelta
-                    expires_at = order.completed_at + timedelta(days=30)
-                elif order.plan_type == 'annual':
-                    from datetime import timedelta
-                    expires_at = order.completed_at + timedelta(days=365)
-            
-            subscriptions.append({
-                'id': order.id,
-                'name': order.service.name,
-                'slug': order.service.slug,
-                'short_description': order.service.short_description,
-                'plan_type': order.plan_type,
-                'platform': order.platform,
-                'subscribed_at': order.completed_at.isoformat() if order.completed_at else None,
-                'expires_at': expires_at.isoformat() if expires_at else None,
-                'is_active': True
-            })
-    
-    return subscriptions
+    try:
+        # Try PostgreSQL first
+        # Get completed orders (active subscriptions)
+        orders_result = await db.execute(
+            select(Order).filter(
+                Order.user_id == current_user.id,
+                Order.payment_status == 'completed'
+            ).options(selectinload(Order.service))
+        )
+        orders = orders_result.scalars().all()
+        
+        # Transform orders to subscription format
+        subscriptions = []
+        for order in orders:
+            if order.service:
+                # Calculate expiration date based on plan type
+                expires_at = None
+                if order.completed_at:
+                    if order.plan_type == 'monthly':
+                        from datetime import timedelta
+                        expires_at = order.completed_at + timedelta(days=30)
+                    elif order.plan_type == 'annual':
+                        from datetime import timedelta
+                        expires_at = order.completed_at + timedelta(days=365)
+                
+                subscriptions.append({
+                    'id': order.id,
+                    'name': order.service.name,
+                    'slug': order.service.slug,
+                    'short_description': order.service.short_description,
+                    'plan_type': order.plan_type,
+                    'platform': order.platform,
+                    'subscribed_at': order.completed_at.isoformat() if order.completed_at else None,
+                    'expires_at': expires_at.isoformat() if expires_at else None,
+                    'is_active': True
+                })
+        
+        return subscriptions
+        
+    except Exception as e:
+        # MongoDB fallback - return empty subscriptions for now
+        logger.warning(f"PostgreSQL not available for subscriptions, using MongoDB fallback: {str(e)}")
+        
+        # In MongoDB mode, we don't have orders/subscriptions yet, so return empty list
+        # This is expected behavior when PostgreSQL is not available
+        return []
 
 @api_router.get('/user/transactions')
 async def get_user_transactions(

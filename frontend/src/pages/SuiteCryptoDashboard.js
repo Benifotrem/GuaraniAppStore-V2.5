@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
@@ -16,15 +17,35 @@ const SuiteCryptoDashboard = () => {
   const [txHash, setTxHash] = useState('');
   const [scanResult, setScanResult] = useState(null);
   const [scanLoading, setScanLoading] = useState(false);
+  const [scanHistory, setScanHistory] = useState([]);
+  const [cryptoshieldStats, setCryptoshieldStats] = useState(null);
   
   // Momentum states
   const [cryptoSymbol, setCryptoSymbol] = useState('BTC');
   const [signal, setSignal] = useState(null);
   const [signalLoading, setSignalLoading] = useState(false);
+  const [signalHistory, setSignalHistory] = useState([]);
+  const [momentumStats, setMomentumStats] = useState(null);
+  
+  // Pulse states
+  const [pulseData, setPulseData] = useState(null);
+  const [pulseLoading, setPulseLoading] = useState(false);
 
   useEffect(() => {
     loadSuiteData();
   }, []);
+
+  useEffect(() => {
+    if (activeService === 'cryptoshield-ia') {
+      loadCryptoShieldHistory();
+      loadCryptoShieldStats();
+    } else if (activeService === 'momentum-predictor-ia') {
+      loadSignalHistory();
+      loadMomentumStats();
+    } else if (activeService === 'pulse-ia') {
+      loadPulseData();
+    }
+  }, [activeService]);
 
   const loadSuiteData = async () => {
     const token = localStorage.getItem('token');
@@ -40,6 +61,63 @@ const SuiteCryptoDashboard = () => {
     } catch (error) {
       console.error('Error loading suite data:', error);
       setLoading(false);
+    }
+  };
+
+  const loadCryptoShieldHistory = async () => {
+    try {
+      const response = await axios.get(`${API}/cryptoshield/scans/history?limit=10`);
+      setScanHistory(response.data);
+    } catch (error) {
+      console.error('Error loading scan history:', error);
+    }
+  };
+
+  const loadCryptoShieldStats = async () => {
+    try {
+      const response = await axios.get(`${API}/cryptoshield/stats`);
+      setCryptoshieldStats(response.data);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  };
+
+  const loadSignalHistory = async () => {
+    try {
+      const response = await axios.get(`${API}/momentum/signals/history?limit=10`);
+      setSignalHistory(response.data);
+    } catch (error) {
+      console.error('Error loading signal history:', error);
+    }
+  };
+
+  const loadMomentumStats = async () => {
+    try {
+      const response = await axios.get(`${API}/momentum/stats/${cryptoSymbol}`);
+      setMomentumStats(response.data);
+    } catch (error) {
+      console.error('Error loading momentum stats:', error);
+    }
+  };
+
+  const loadPulseData = async () => {
+    setPulseLoading(true);
+    try {
+      // Simular datos de sentimiento para el gráfico
+      const mockData = [
+        { date: '24/10', sentiment: 65, fomo: 45, fud: 30 },
+        { date: '25/10', sentiment: 72, fomo: 55, fud: 25 },
+        { date: '26/10', sentiment: 58, fomo: 35, fud: 40 },
+        { date: '27/10', sentiment: 75, fomo: 60, fud: 20 },
+        { date: '28/10', sentiment: 68, fomo: 50, fud: 28 },
+        { date: '29/10', sentiment: 80, fomo: 70, fud: 15 },
+        { date: '30/10', sentiment: 85, fomo: 75, fud: 10 }
+      ];
+      setPulseData(mockData);
+    } catch (error) {
+      console.error('Error loading pulse data:', error);
+    } finally {
+      setPulseLoading(false);
     }
   };
 

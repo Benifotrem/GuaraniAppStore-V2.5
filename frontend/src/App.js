@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
 import CheckoutPage from './pages/CheckoutPage';
 import Dashboard from './pages/Dashboard';
 import SuiteCryptoDashboard from './pages/SuiteCryptoDashboard';
 import AdminPanel from './pages/AdminPanel';
+import ClientDashboard from './pages/ClientDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import CryptoSuite from './pages/services/CryptoSuite';
 import AsistenteDirectivos from './pages/services/AsistenteDirectivos';
 import PreseleccionCurricular from './pages/services/PreseleccionCurricular';

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Configuración de OAuth
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_OAUTH_REDIRECT_URI', 'https://crypto-sentiment-hub.preview.emergentagent.com/api/auth/google/callback')
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_OAUTH_REDIRECT_URI', 'https://cryptoshield-app.preview.emergentagent.com/api/auth/google/callback')
 
 SCOPES = [
     'openid',

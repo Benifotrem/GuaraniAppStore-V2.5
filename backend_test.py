@@ -12,7 +12,7 @@ from typing import Dict, Any, Optional
 
 class GuaraniBackendTester:
     def __init__(self):
-        self.base_url = "https://crypto-sentiment-hub.preview.emergentagent.com/api"
+        self.base_url = "https://cryptoshield-app.preview.emergentagent.com/api"
         self.session = requests.Session()
         self.admin_token = None
         self.test_results = []

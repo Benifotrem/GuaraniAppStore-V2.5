@@ -100,7 +100,7 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/client-dashboard')}
               className="text-white/70 hover:text-white text-sm font-medium"
             >
               Ver como Cliente

@@ -1677,14 +1677,49 @@ async def get_all_users(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all users (Admin only)"""
-    result = await db.execute(
-        select(User)
-        .order_by(User.created_at.desc())
-        .offset(skip)
-        .limit(limit)
-    )
-    users = result.scalars().all()
-    return [UserResponse.model_validate(user) for user in users]
+    try:
+        # Try PostgreSQL first
+        result = await db.execute(
+            select(User)
+            .order_by(User.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        users = result.scalars().all()
+        return [UserResponse.model_validate(user) for user in users]
+        
+    except Exception as e:
+        # MongoDB fallback
+        logger.warning(f"PostgreSQL not available for admin users, using MongoDB fallback: {str(e)}")
+        
+        # Get users from MongoDB with pagination
+        mongo_users = await users_collection.find().skip(skip).limit(limit).to_list(length=limit)
+        
+        # Convert MongoDB users to UserResponse format
+        user_responses = []
+        for user_data in mongo_users:
+            user_id = str(user_data.get('_id', user_data.get('id', '')))
+            
+            user_response = UserResponse(
+                id=user_id,
+                email=user_data.get('email', ''),
+                full_name=user_data.get('name', user_data.get('full_name', 'User')),
+                role=UserRole.ADMIN if user_data.get('is_admin') else UserRole.USER,
+                is_active=user_data.get('is_active', True),
+                is_verified=user_data.get('is_verified', True),
+                two_factor_enabled=user_data.get('two_factor_enabled', False),
+                phone=user_data.get('phone'),
+                company=user_data.get('company'),
+                country=user_data.get('country', 'Paraguay'),
+                timezone=user_data.get('timezone', 'America/Asuncion'),
+                profile_picture=user_data.get('profile_picture'),
+                google_id=user_data.get('google_id'),
+                created_at=user_data.get('created_at', datetime.utcnow()),
+                last_login=user_data.get('last_login')
+            )
+            user_responses.append(user_response)
+        
+        return user_responses
 
 @api_router.put('/admin/users/{user_id}/role')
 async def update_user_role(

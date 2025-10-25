@@ -21,6 +21,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis Cache (NUEVO - Ejemplo de contenedor adicional)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: guarani_redis
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - guarani_network
+  #   command: redis-server --appendonly yes
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
   # Backend API (FastAPI)
   backend:
     build:

@@ -76,6 +76,7 @@ function App() {
         <Route path="/" element={<LandingPage services={services} />} />
         <Route path="/checkout/:serviceId" element={<CheckoutPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/suite-crypto" element={<SuiteCryptoDashboard />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/services/crypto-suite" element={<CryptoSuite />} />
         <Route path="/services/asistente-directivos" element={<AsistenteDirectivos />} />

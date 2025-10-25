@@ -495,7 +495,12 @@ const LandingPage = ({ services }) => {
                   
                   {/* Button */}
                   <button 
+                    data-testid={`subscribe-btn-${service.slug || service.id}`}
+                    data-service-id={service.id}
+                    data-service-status={service.status}
                     onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       console.log('Suscribirse clicked', { 
                         status: service.status, 
                         isAuthenticated, 

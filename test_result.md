@@ -344,7 +344,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Subscription Flow Testing - COMPLETED"
+    - "Subscription Flow Fix Verification - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -25,6 +25,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     role: UserRole
+    is_admin: bool = False
     is_active: bool
     is_verified: bool
     two_factor_enabled: bool

@@ -362,7 +362,9 @@ async def google_login(
 @api_router.get('/auth/me', response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
     """Get current user profile"""
-    return UserResponse.model_validate(current_user)
+    user_response = UserResponse.model_validate(current_user)
+    user_response.is_admin = current_user.role == UserRole.ADMIN
+    return user_response
 
 @api_router.post('/auth/2fa/enable')
 async def enable_2fa(

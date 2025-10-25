@@ -1470,9 +1470,9 @@ class GuaraniBackendTester:
         self.print_summary()
 
     def print_summary(self):
-        """Print test summary focusing on CryptoShield IA"""
+        """Print test summary focusing on authentication and dashboard endpoints"""
         print("=" * 70)
-        print("TEST SUMMARY - CRYPTOSHIELD IA SISTEMA COMPLETO")
+        print("TEST SUMMARY - AUTHENTICATION & DASHBOARD ENDPOINTS")
         print("=" * 70)
         
         total_tests = len(self.test_results)
@@ -1485,43 +1485,45 @@ class GuaraniBackendTester:
         print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
         print()
         
-        # Check CryptoShield endpoints
-        cryptoshield_health = any(r['success'] and r['test'] == 'CryptoShield Health Check' for r in self.test_results)
-        wallet_scans = all(any(r['success'] and 'CryptoShield Wallet Scan' in r['test'] for r in self.test_results) 
-                          for _ in self.test_wallets)
-        tx_verifications = all(any(r['success'] and 'CryptoShield TX Verify' in r['test'] for r in self.test_results) 
-                              for _ in self.test_tx_hashes)
-        contract_scan = any(r['success'] and r['test'] == 'CryptoShield Contract Scan (USDT)' for r in self.test_results)
-        scan_history = any(r['success'] and 'CryptoShield Scan History' in r['test'] for r in self.test_results)
-        stats = any(r['success'] and r['test'] == 'CryptoShield Statistics' for r in self.test_results)
-        
-        # Check validation and error handling
-        address_validation = any(r['success'] and r['test'] == 'CryptoShield Address Validation' for r in self.test_results)
-        tx_validation = any(r['success'] and r['test'] == 'CryptoShield TX Hash Validation' for r in self.test_results)
-        
-        # Check critical validations
-        etherscan_integration = any(r['success'] and r['test'] == 'CryptoShield Etherscan Integration' for r in self.test_results)
-        risk_scoring = any(r['success'] and r['test'] == 'CryptoShield Risk Scoring' for r in self.test_results)
+        # Check authentication and dashboard endpoints
+        admin_login = any(r['success'] and r['test'] == 'Admin Login' for r in self.test_results)
+        auth_me = any(r['success'] and r['test'] == 'Auth Me Endpoint' for r in self.test_results)
+        user_subscriptions = any(r['success'] and r['test'] == 'User Subscriptions Endpoint' for r in self.test_results)
+        admin_stats = any(r['success'] and r['test'] == 'Admin Stats Endpoint' for r in self.test_results)
+        admin_users = any(r['success'] and r['test'] == 'Admin Users Endpoint' for r in self.test_results)
         
         # Check core endpoints
+        health_check = any(r['success'] and r['test'] == 'Health Check' for r in self.test_results)
         countries_success = any(r['success'] and r['test'] == 'Countries Endpoint' for r in self.test_results)
         services_success = any(r['success'] and r['test'] == 'Services Endpoint' for r in self.test_results)
         backend_success = any(r['success'] and r['test'] == 'Backend Status' for r in self.test_results)
         mongodb_success = any(r['success'] and r['test'] == 'MongoDB Connection' for r in self.test_results)
         
-        print("🛡️ CRYPTOSHIELD IA ENDPOINTS:")
-        print(f"   /api/cryptoshield/health:                    {'✅ WORKING' if cryptoshield_health else '❌ FAILED'}")
-        print(f"   /api/cryptoshield/scan/wallet/{{address}}:    {'✅ WORKING' if wallet_scans else '❌ FAILED'}")
-        print(f"   /api/cryptoshield/verify/transaction/{{hash}}: {'✅ WORKING' if tx_verifications else '❌ FAILED'}")
-        print(f"   /api/cryptoshield/scan/contract/{{address}}:  {'✅ WORKING' if contract_scan else '❌ FAILED'}")
-        print(f"   /api/cryptoshield/scans/history:             {'✅ WORKING' if scan_history else '❌ FAILED'}")
-        print(f"   /api/cryptoshield/stats:                     {'✅ WORKING' if stats else '❌ FAILED'}")
+        # Check additional endpoints
+        bots_status = any(r['success'] and r['test'] == 'Bots Status' for r in self.test_results)
+        momentum_health = any(r['success'] and r['test'] == 'Momentum Health Check' for r in self.test_results)
+        cryptoshield_health = any(r['success'] and r['test'] == 'CryptoShield Health Check' for r in self.test_results)
+        
+        print("🔐 AUTHENTICATION & DASHBOARD ENDPOINTS:")
+        print(f"   POST /api/auth/login:                        {'✅ WORKING' if admin_login else '❌ FAILED'}")
+        print(f"   GET /api/auth/me:                            {'✅ WORKING' if auth_me else '❌ FAILED'}")
+        print(f"   GET /api/user/subscriptions:                 {'✅ WORKING' if user_subscriptions else '❌ FAILED'}")
+        print(f"   GET /api/admin/stats:                        {'✅ WORKING' if admin_stats else '❌ FAILED'}")
+        print(f"   GET /api/admin/users:                        {'✅ WORKING' if admin_users else '❌ FAILED'}")
         print()
         
-        print("🔍 VALIDATION & ERROR HANDLING:")
-        print(f"   Address Format Validation (42 chars):       {'✅ WORKING' if address_validation else '❌ FAILED'}")
-        print(f"   TX Hash Format Validation (66 chars):       {'✅ WORKING' if tx_validation else '❌ FAILED'}")
-        print(f"   400 Bad Request for Invalid Inputs:         {'✅ WORKING' if address_validation and tx_validation else '❌ FAILED'}")
+        print("🌐 CORE API ENDPOINTS:")
+        print(f"   GET /api/health:                             {'✅ WORKING' if health_check else '❌ FAILED'}")
+        print(f"   GET /api/countries:                          {'✅ WORKING' if countries_success else '❌ FAILED'}")
+        print(f"   GET /api/services:                           {'✅ WORKING' if services_success else '❌ FAILED'}")
+        print(f"   Backend Status:                              {'✅ WORKING' if backend_success else '❌ FAILED'}")
+        print(f"   MongoDB Connection:                          {'✅ WORKING' if mongodb_success else '❌ FAILED'}")
+        print()
+        
+        print("🤖 ADDITIONAL SERVICES:")
+        print(f"   Bot Management Status:                       {'✅ WORKING' if bots_status else '❌ FAILED'}")
+        print(f"   Momentum Predictor Health:                   {'✅ WORKING' if momentum_health else '❌ FAILED'}")
+        print(f"   CryptoShield Health:                         {'✅ WORKING' if cryptoshield_health else '❌ FAILED'}")
         print()
         
         print("🔧 CORE SYSTEM STATUS:")

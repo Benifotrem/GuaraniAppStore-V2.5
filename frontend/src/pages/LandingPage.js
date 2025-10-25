@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import VideoBackground from '../components/VideoBackground';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -11,6 +12,7 @@ const API = `${BACKEND_URL}/api`;
 
 const LandingPage = ({ services }) => {
   const navigate = useNavigate();
+  const { login: authLogin, register: authRegister, user } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);

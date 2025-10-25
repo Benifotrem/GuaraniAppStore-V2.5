@@ -54,7 +54,7 @@ const Header = ({ onLoginClick, onTrialClick }) => {
           
           {/* Botón Iniciar Sesión o Ir al Dashboard */}
           <button className="btn-login" data-testid="login-btn" onClick={handleLogin}>
-            {isLoggedIn ? '🎯 Ir al Dashboard' : 'Iniciar Sesión'}
+            {isAuthenticated ? '🎯 Ir al Dashboard' : 'Iniciar Sesión'}
           </button>
         </div>
 

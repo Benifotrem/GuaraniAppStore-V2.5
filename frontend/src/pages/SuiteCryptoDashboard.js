@@ -479,6 +479,63 @@ const SuiteCryptoDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Estadísticas del Símbolo */}
+            {momentumStats && (
+              <div className="bg-white/5 rounded-xl p-6 mt-6">
+                <h3 className="text-xl font-bold text-white mb-4">📊 Estadísticas de {cryptoSymbol}</h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Total Predicciones</p>
+                    <p className="text-3xl font-bold text-white">{momentumStats.total_predictions || 0}</p>
+                  </div>
+                  <div className="bg-green-500/20 rounded-lg p-4">
+                    <p className="text-green-400 text-sm mb-1">Señales BUY</p>
+                    <p className="text-3xl font-bold text-white">{momentumStats.buy_signals || 0}</p>
+                    <p className="text-green-400 text-xs">{momentumStats.buy_percentage || 0}%</p>
+                  </div>
+                  <div className="bg-red-500/20 rounded-lg p-4">
+                    <p className="text-red-400 text-sm mb-1">Señales SELL</p>
+                    <p className="text-3xl font-bold text-white">{momentumStats.sell_signals || 0}</p>
+                    <p className="text-red-400 text-xs">{momentumStats.sell_percentage || 0}%</p>
+                  </div>
+                  <div className="bg-yellow-500/20 rounded-lg p-4">
+                    <p className="text-yellow-400 text-sm mb-1">Señales HOLD</p>
+                    <p className="text-3xl font-bold text-white">{momentumStats.hold_signals || 0}</p>
+                    <p className="text-yellow-400 text-xs">{momentumStats.hold_percentage || 0}%</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Historial de Señales */}
+            {signalHistory && signalHistory.length > 0 && (
+              <div className="bg-white/5 rounded-xl p-6 mt-6">
+                <h3 className="text-xl font-bold text-white mb-4">📝 Historial de Señales</h3>
+                <div className="space-y-3">
+                  {signalHistory.slice(0, 5).map((sig, idx) => (
+                    <div key={idx} className="bg-white/5 rounded-lg p-4 flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="text-white font-semibold mb-1">{sig.symbol}</p>
+                        <p className="text-white/50 text-xs">
+                          ${sig.current_price?.toLocaleString()} · {sig.timeframe}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-4 py-2 rounded-lg font-bold ${
+                          sig.signal === 'BUY' ? 'bg-green-500' :
+                          sig.signal === 'SELL' ? 'bg-red-500' :
+                          'bg-yellow-500'
+                        } text-white`}>
+                          {sig.signal}
+                        </span>
+                        <span className="text-white/60 text-sm">{sig.confidence}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -121,6 +121,8 @@ volumes:
     driver: local
   nginx_logs:
     driver: local
+  # redis_data:
+  #   driver: local
 
 networks:
   guarani_network:

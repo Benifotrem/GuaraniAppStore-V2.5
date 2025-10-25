@@ -320,6 +320,62 @@ const SuiteCryptoDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Estadísticas */}
+            {cryptoshieldStats && (
+              <div className="bg-white/5 rounded-xl p-6 mt-6">
+                <h3 className="text-xl font-bold text-white mb-4">📊 Estadísticas Totales</h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Total Escaneos</p>
+                    <p className="text-3xl font-bold text-white">{cryptoshieldStats.total_scans || 0}</p>
+                  </div>
+                  <div className="bg-green-500/20 rounded-lg p-4">
+                    <p className="text-green-400 text-sm mb-1">Riesgo Bajo</p>
+                    <p className="text-3xl font-bold text-white">{cryptoshieldStats.low_risk_found || 0}</p>
+                  </div>
+                  <div className="bg-yellow-500/20 rounded-lg p-4">
+                    <p className="text-yellow-400 text-sm mb-1">Riesgo Medio</p>
+                    <p className="text-3xl font-bold text-white">{cryptoshieldStats.medium_risk_found || 0}</p>
+                  </div>
+                  <div className="bg-red-500/20 rounded-lg p-4">
+                    <p className="text-red-400 text-sm mb-1">Riesgo Alto</p>
+                    <p className="text-3xl font-bold text-white">{cryptoshieldStats.high_risk_found || 0}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Historial de Escaneos */}
+            {scanHistory && scanHistory.length > 0 && (
+              <div className="bg-white/5 rounded-xl p-6 mt-6">
+                <h3 className="text-xl font-bold text-white mb-4">📝 Historial de Escaneos</h3>
+                <div className="space-y-3">
+                  {scanHistory.slice(0, 5).map((scan, idx) => (
+                    <div key={idx} className="bg-white/5 rounded-lg p-4 flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="text-white font-semibold text-sm mb-1">
+                          {scan.scan_type === 'wallet' ? '👛 Wallet' : scan.scan_type === 'transaction' ? '💸 TX' : '📄 Contract'}
+                        </p>
+                        <p className="text-white/50 text-xs">
+                          {scan.address_or_hash ? `${scan.address_or_hash.substring(0, 10)}...${scan.address_or_hash.substring(scan.address_or_hash.length - 8)}` : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          scan.risk_level === 'high' ? 'bg-red-500' :
+                          scan.risk_level === 'medium' ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        } text-white`}>
+                          {scan.risk_level?.toUpperCase()}
+                        </span>
+                        <span className="text-white/60 text-xs">{scan.risk_score || 0}/100</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

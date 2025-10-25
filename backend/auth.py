@@ -70,19 +70,59 @@ async def get_current_user(
     if user_id is None:
         raise credentials_exception
     
-    result = await db.execute(select(User).filter(User.id == user_id))
-    user = result.scalar_one_or_none()
-    
-    if user is None:
-        raise credentials_exception
-    
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='User account is inactive'
+    # Try PostgreSQL first
+    try:
+        result = await db.execute(select(User).filter(User.id == user_id))
+        user = result.scalar_one_or_none()
+        
+        if user is None:
+            raise credentials_exception
+        
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='User account is inactive'
+            )
+        
+        return user
+        
+    except Exception as e:
+        # Fallback to MongoDB
+        logger.warning(f"PostgreSQL not available for auth, using MongoDB: {str(e)}")
+        
+        user_data = await users_collection.find_one({'id': user_id})
+        
+        if user_data is None:
+            raise credentials_exception
+        
+        # Create User object from MongoDB data
+        user = User(
+            id=user_data.get('id'),
+            email=user_data.get('email'),
+            full_name=user_data.get('full_name'),
+            hashed_password=user_data.get('hashed_password'),
+            is_active=user_data.get('is_active', True),
+            is_admin=user_data.get('is_admin', False),
+            role=UserRole.ADMIN if user_data.get('is_admin') else UserRole.USER,
+            created_at=user_data.get('created_at'),
+            country=user_data.get('country'),
+            timezone=user_data.get('timezone'),
+            language=user_data.get('language', 'es'),
+            whatsapp_number=user_data.get('whatsapp_number'),
+            telegram_username=user_data.get('telegram_username'),
+            is_verified=user_data.get('is_verified', False),
+            verification_token=user_data.get('verification_token'),
+            two_factor_enabled=user_data.get('two_factor_enabled', False),
+            two_factor_secret=user_data.get('two_factor_secret')
         )
-    
-    return user
+        
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='User account is inactive'
+            )
+        
+        return user
 
 async def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.role != UserRole.ADMIN:

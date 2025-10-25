@@ -661,7 +661,9 @@ const LandingPage = ({ services }) => {
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required
+                    minLength={8}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-10"
+                    placeholder={isLogin ? '' : 'Mínimo 8 caracteres'}
                   />
                   <button
                     type="button"
@@ -671,6 +673,9 @@ const LandingPage = ({ services }) => {
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
+                {!isLogin && (
+                  <p className="text-xs text-gray-500 mt-1">La contraseña debe tener al menos 8 caracteres</p>
+                )}
                 {isLogin && (
                   <div className="text-right mt-1">
                     <button

@@ -497,9 +497,8 @@ const LandingPage = ({ services }) => {
                   <button 
                     onClick={() => {
                       if (service.status === 'coming_soon') return;
-                      // Check if user is authenticated
-                      const token = localStorage.getItem('token');
-                      if (token) {
+                      // Check if user is authenticated using AuthContext
+                      if (isAuthenticated) {
                         // Navigate to checkout
                         navigate(`/checkout/${service.id}`);
                       } else {

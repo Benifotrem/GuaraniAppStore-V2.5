@@ -585,7 +585,7 @@ const LandingPage = ({ services }) => {
         <div className="max-w-4xl mx-auto text-center glass-dark rounded-3xl p-12 border-2 border-white/30">
           <h3 className="text-4xl sm:text-5xl font-bold mb-6 text-white">¿Listo para automatizar?</h3>
           <p className="text-xl mb-10 text-emerald-100">Prueba gratis por 7 días. Sin tarjeta de crédito.</p>
-          {!isLoggedIn && (
+          {!isAuthenticated && (
             <button
               onClick={() => setShowAuth(true)}
               className="bg-white text-emerald-600 hover:bg-emerald-50 px-10 py-6 text-xl rounded-full shadow-2xl font-semibold"

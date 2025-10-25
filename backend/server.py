@@ -3026,6 +3026,17 @@ except Exception as e:
     logger.warning(f"⚠️ CryptoShield IA endpoints not loaded: {e}")
 
 
+# ============================================
+# SUITE CRYPTO IA UNIFIED ENDPOINTS
+# ============================================
+try:
+    from suite_crypto_api import router as suite_crypto_router
+    app.include_router(suite_crypto_router)
+    logger.info("✅ Suite Crypto IA unified endpoints loaded")
+except Exception as e:
+    logger.warning(f"⚠️ Suite Crypto IA endpoints not loaded: {e}")
+
+
 # Include router in app
 app.include_router(api_router)
 

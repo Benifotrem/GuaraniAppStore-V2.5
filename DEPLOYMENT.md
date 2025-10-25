@@ -106,7 +106,7 @@ scp -r /ruta/local/app usuario@ip-vps:/opt/GuaraniAppStore-V2.5
 ### Configurar variables de entorno
 
 ```bash
-cd /opt/guaraniappstore
+cd /opt/GuaraniAppStore-V2.5
 
 # Copiar y editar .env del backend
 cp .env.example backend/.env

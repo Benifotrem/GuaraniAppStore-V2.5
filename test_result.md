@@ -506,6 +506,18 @@ frontend:
         agent: "testing"
         comment: "✅ TESTING FASE 2 COMPLETADO CON ÉXITO (100% success rate) - Momentum Predictor IA Fase 2 completamente funcional: VERIFICACIÓN EXHAUSTIVA: Todos los criterios de éxito cumplidos. CAMPO INDICATORS: ✅ Presente en response con 7 valores (rsi, macd, sma_7, sma_25, stoch_k, buy_score, sell_score). MODEL VERSION: ✅ MOCK_v2_Technical_Analysis confirmado. INDICADORES TÉCNICOS: ✅ 20 indicadores calculados con valores realistas (RSI 0-100, MACD válido, SMA positivos, Stochastic 0-100). SISTEMA SCORING: ✅ buy_score y sell_score enteros 0-8, lógica consistente (BUY: buy>=sell+2, SELL: sell>=buy+2, HOLD: |diff|<2). CONFIANZA DINÁMICA: ✅ Varía 60%-65% según diferencia scores (no siempre 60%). PROBABILITIES: ✅ Varían dinámicamente según bias BUY/SELL en señales HOLD. SEÑALES PROBADAS: BTC ($111,025), ETH ($3,953), SOL ($193), ADA ($0.65), DOT ($3.06) - todas con análisis técnico completo. HEALTH CHECK: ✅ Refleja cambios Fase 2. SISTEMA COMPLETAMENTE OPERATIVO para análisis técnico avanzado."
 
+  - task: "Authentication and Dashboard Endpoints Testing"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRÍTICO: Endpoints de autenticación y dashboard fallan por falta de PostgreSQL. RESULTADOS: ✅ POST /api/auth/login funciona (fallback a MongoDB), ❌ GET /api/auth/me falla (500 Internal Server Error), ❌ GET /api/user/subscriptions falla (500), ❌ GET /api/admin/stats falla (500), ❌ GET /api/admin/users falla (500). CAUSA RAÍZ: Sistema configurado para MongoDB-only pero endpoints protegidos intentan usar PostgreSQL (get_current_user en auth.py requiere AsyncSession de PostgreSQL). Login funciona porque tiene fallback a MongoDB, pero get_current_user no tiene este fallback. SOLUCIÓN REQUERIDA: Implementar fallback a MongoDB en auth.py para get_current_user o configurar PostgreSQL. Backend logs confirman: 'OSError: Multiple exceptions: [Errno 111] Connect call failed ('127.0.0.1', 5432)'."
+
   - task: "CryptoShield IA - Fase 1: Integración y Lógica MOCK"
     implemented: true
     working: true

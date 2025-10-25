@@ -8,8 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models import User, UserRole
 from database import get_db
+from database_mongo import users_collection
 import pyotp
 import secrets
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Password hashing
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')

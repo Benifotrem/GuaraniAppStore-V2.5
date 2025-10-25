@@ -1411,6 +1411,167 @@ class GuaraniBackendTester:
         else:
             self.log_test("Admin Users Endpoint", False, f"Status code: {status_code}", data)
 
+    def test_auth_me_endpoint(self):
+        """Test GET /api/auth/me endpoint"""
+        if not self.admin_token:
+            self.log_test("Auth Me Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/auth/me')
+        
+        if success and isinstance(data, dict):
+            # Check required fields
+            required_fields = ['id', 'email', 'full_name', 'role', 'is_active']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                email = data.get('email')
+                role = data.get('role')
+                is_admin = data.get('is_admin', False)
+                is_active = data.get('is_active')
+                
+                # Validate admin user
+                if (email == self.admin_email and 
+                    role == 'admin' and 
+                    is_admin == True and 
+                    is_active == True):
+                    self.log_test("Auth Me Endpoint", True, 
+                                f"Admin user verified: {email}, Role: {role}, Active: {is_active}")
+                else:
+                    self.log_test("Auth Me Endpoint", False, 
+                                f"Invalid admin data - Email: {email}, Role: {role}, Admin: {is_admin}, Active: {is_active}")
+            else:
+                self.log_test("Auth Me Endpoint", False, f"Missing fields: {missing_fields}")
+        else:
+            self.log_test("Auth Me Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_user_subscriptions_endpoint(self):
+        """Test GET /api/user/subscriptions endpoint"""
+        if not self.admin_token:
+            self.log_test("User Subscriptions Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/user/subscriptions')
+        
+        if success and isinstance(data, list):
+            # Should return a list (empty or with subscriptions)
+            self.log_test("User Subscriptions Endpoint", True, 
+                        f"Retrieved {len(data)} subscriptions")
+            
+            # If there are subscriptions, validate structure
+            if data:
+                first_sub = data[0]
+                required_fields = ['id', 'name', 'plan_type', 'is_active']
+                missing_fields = [field for field in required_fields if field not in first_sub]
+                
+                if not missing_fields:
+                    self.log_test("User Subscriptions Structure", True, 
+                                f"Subscription structure valid: {first_sub.get('name')}")
+                else:
+                    self.log_test("User Subscriptions Structure", False, 
+                                f"Missing fields in subscription: {missing_fields}")
+        else:
+            self.log_test("User Subscriptions Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_admin_stats_endpoint(self):
+        """Test GET /api/admin/stats endpoint"""
+        if not self.admin_token:
+            self.log_test("Admin Stats Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/admin/stats')
+        
+        if success and isinstance(data, dict):
+            # Check required sections
+            required_sections = ['users', 'orders', 'revenue', 'services']
+            missing_sections = [section for section in required_sections if section not in data]
+            
+            if not missing_sections:
+                users = data.get('users', {})
+                orders = data.get('orders', {})
+                revenue = data.get('revenue', {})
+                services = data.get('services', {})
+                
+                # Validate structure
+                users_valid = 'total' in users
+                orders_valid = 'total' in orders and 'completed' in orders
+                revenue_valid = 'total' in revenue
+                services_valid = 'total' in services
+                
+                if all([users_valid, orders_valid, revenue_valid, services_valid]):
+                    self.log_test("Admin Stats Endpoint", True, 
+                                f"Stats retrieved - Users: {users.get('total')}, "
+                                f"Orders: {orders.get('total')}, "
+                                f"Revenue: {revenue.get('total')}, "
+                                f"Services: {services.get('total')}")
+                else:
+                    validation_errors = []
+                    if not users_valid: validation_errors.append("Users section invalid")
+                    if not orders_valid: validation_errors.append("Orders section invalid")
+                    if not revenue_valid: validation_errors.append("Revenue section invalid")
+                    if not services_valid: validation_errors.append("Services section invalid")
+                    
+                    self.log_test("Admin Stats Endpoint", False, "; ".join(validation_errors))
+            else:
+                self.log_test("Admin Stats Endpoint", False, f"Missing sections: {missing_sections}")
+        else:
+            self.log_test("Admin Stats Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_admin_users_list_endpoint(self):
+        """Test GET /api/admin/users endpoint"""
+        if not self.admin_token:
+            self.log_test("Admin Users List Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/admin/users')
+        
+        if success and isinstance(data, list):
+            self.log_test("Admin Users List Endpoint", True, 
+                        f"Retrieved {len(data)} users")
+            
+            # If there are users, validate structure
+            if data:
+                first_user = data[0]
+                required_fields = ['id', 'email', 'full_name', 'role', 'is_active', 'created_at']
+                missing_fields = [field for field in required_fields if field not in first_user]
+                
+                if not missing_fields:
+                    self.log_test("Admin Users List Structure", True, 
+                                f"User structure valid: {first_user.get('email')}")
+                else:
+                    self.log_test("Admin Users List Structure", False, 
+                                f"Missing fields in user: {missing_fields}")
+        else:
+            self.log_test("Admin Users List Endpoint", False, f"Status code: {status_code}", data)
+
+    def run_authentication_tests(self):
+        """Run authentication and dashboard endpoint tests as requested"""
+        print("🔐 AUTHENTICATION & DASHBOARD ENDPOINTS TESTING")
+        print("=" * 60)
+        
+        # Test 1: POST /api/auth/login - Login as admin
+        print("1. Testing admin login...")
+        self.test_admin_login()
+        
+        # Test 2: GET /api/auth/me - Verify returns user with is_admin=true
+        print("2. Testing auth/me endpoint...")
+        self.test_auth_me_endpoint()
+        
+        # Test 3: GET /api/user/subscriptions - Test user subscriptions endpoint
+        print("3. Testing user subscriptions endpoint...")
+        self.test_user_subscriptions_endpoint()
+        
+        # Test 4: GET /api/admin/stats - Test admin stats endpoint
+        print("4. Testing admin stats endpoint...")
+        self.test_admin_stats_endpoint()
+        
+        # Test 5: GET /api/admin/users - Test admin users list endpoint
+        print("5. Testing admin users list endpoint...")
+        self.test_admin_users_list_endpoint()
+        
+        # Print summary
+        self.print_summary()
+
     def run_all_tests(self):
         """Run backend tests focusing on authentication and dashboard endpoints"""
         print("🚀 Starting GuaraniAppStore Backend Testing Suite")

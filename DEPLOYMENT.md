@@ -244,12 +244,12 @@ for name, token in bots.items():
 ```bash
 # Generar certificado self-signed para origen
 sudo apt install -y openssl
-sudo mkdir -p /opt/guaraniappstore/nginx/ssl
+sudo mkdir -p /opt/GuaraniAppStore-V2.5/nginx/ssl
 
 # Generar certificado
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout /opt/guaraniappstore/nginx/ssl/privkey.pem \
-  -out /opt/guaraniappstore/nginx/ssl/fullchain.pem
+  -keyout /opt/GuaraniAppStore-V2.5/nginx/ssl/privkey.pem \
+  -out /opt/GuaraniAppStore-V2.5/nginx/ssl/fullchain.pem
 
 # Reiniciar nginx
 docker-compose restart nginx

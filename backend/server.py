@@ -157,46 +157,116 @@ async def register(
     user_data: UserCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    """Register a new user"""
-    # Check if user exists
-    result = await db.execute(select(User).filter(User.email == user_data.email))
-    existing_user = result.scalar_one_or_none()
-    
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Email already registered'
+    """Register a new user - Works with both PostgreSQL and MongoDB"""
+    try:
+        # Try PostgreSQL first
+        result = await db.execute(select(User).filter(User.email == user_data.email))
+        existing_user = result.scalar_one_or_none()
+        
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Email already registered'
+            )
+        
+        # Determine timezone from country
+        timezone = user_data.timezone
+        if not timezone:
+            timezone = get_timezone_for_country(user_data.country)
+        
+        # Create user
+        hashed_password = hash_password(user_data.password)
+        new_user = User(
+            email=user_data.email,
+            password_hash=hashed_password,
+            full_name=user_data.full_name,
+            phone=user_data.phone,
+            company=user_data.company,
+            country=user_data.country,
+            timezone=timezone,
+            role=UserRole.USER
         )
-    
-    # Determine timezone from country
-    timezone = user_data.timezone
-    if not timezone:
-        timezone = get_timezone_for_country(user_data.country)
-    
-    # Create user
-    hashed_password = hash_password(user_data.password)
-    new_user = User(
-        email=user_data.email,
-        password_hash=hashed_password,
-        full_name=user_data.full_name,
-        phone=user_data.phone,
-        company=user_data.company,
-        country=user_data.country,
-        timezone=timezone,
-        role=UserRole.USER
-    )
-    
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    
-    # Create access token
-    access_token = create_access_token({'sub': new_user.id})
-    
-    return TokenResponse(
-        access_token=access_token,
-        user=UserResponse.model_validate(new_user)
-    )
+        
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        
+        # Create access token
+        access_token = create_access_token({'sub': new_user.id})
+        
+        return TokenResponse(
+            access_token=access_token,
+            user=UserResponse.model_validate(new_user)
+        )
+        
+    except Exception as pg_error:
+        # Fallback to MongoDB if PostgreSQL fails
+        logger.warning(f'PostgreSQL registration failed, trying MongoDB: {str(pg_error)}')
+        
+        # Check if user exists in MongoDB
+        existing_mongo_user = await users_collection.find_one({'email': user_data.email})
+        
+        if existing_mongo_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Email already registered'
+            )
+        
+        # Determine timezone from country
+        timezone = user_data.timezone
+        if not timezone:
+            timezone = get_timezone_for_country(user_data.country)
+        
+        # Create user in MongoDB
+        import uuid
+        from datetime import datetime
+        
+        user_id = str(uuid.uuid4())
+        hashed_password = hash_password(user_data.password)
+        
+        mongo_user_data = {
+            'id': user_id,
+            'email': user_data.email,
+            'password': hashed_password,
+            'name': user_data.full_name,
+            'phone': user_data.phone,
+            'company': user_data.company,
+            'country': user_data.country or 'Paraguay',
+            'timezone': timezone,
+            'is_admin': False,
+            'is_active': True,
+            'is_verified': False,
+            'created_at': datetime.utcnow(),
+            'last_login': None
+        }
+        
+        result = await users_collection.insert_one(mongo_user_data)
+        
+        # Create access token with MongoDB user ID
+        access_token = create_access_token({'sub': user_id})
+        
+        # Return response with MongoDB user data
+        return TokenResponse(
+            access_token=access_token,
+            user=UserResponse(
+                id=user_id,
+                email=mongo_user_data['email'],
+                full_name=mongo_user_data['name'],
+                role=UserRole.USER,
+                is_active=True,
+                is_verified=False,
+                is_admin=False,
+                two_factor_enabled=False,
+                phone=mongo_user_data.get('phone'),
+                company=mongo_user_data.get('company'),
+                country=mongo_user_data['country'],
+                timezone=mongo_user_data['timezone'],
+                profile_picture=None,
+                google_id=None,
+                created_at=mongo_user_data['created_at'],
+                last_login=None
+            )
+        )
 
 @api_router.post('/auth/login', response_model=TokenResponse)
 async def login(

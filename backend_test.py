@@ -1412,74 +1412,61 @@ class GuaraniBackendTester:
             self.log_test("Admin Users Endpoint", False, f"Status code: {status_code}", data)
 
     def run_all_tests(self):
-        """Run all backend tests focusing on CryptoShield IA"""
-        print("=" * 70)
-        print("GuaraniAppStore V2.5 Pro Backend Testing Suite")
-        print("Focus: CRYPTOSHIELD IA - SISTEMA COMPLETO DE DETECCIÓN DE FRAUDE")
-        print("=" * 70)
+        """Run backend tests focusing on authentication and dashboard endpoints"""
+        print("🚀 Starting GuaraniAppStore Backend Testing Suite")
+        print("=" * 60)
+        print("Focus: Authentication & Dashboard Endpoints Testing")
+        print("=" * 60)
         print()
         
-        # Core backend status
+        # Basic connectivity tests
         print("🔍 Testing Backend Status...")
         self.test_health_check()
         self.test_backend_logs_check()
         
-        # Critical endpoints that had 502 errors
-        print("🚨 Testing Previously Failing Endpoints...")
-        self.test_countries_endpoint()
-        self.test_services_endpoint()
-        
-        # Database connectivity
-        print("💾 Testing Database Connectivity...")
-        self.test_mongodb_connection()
-        
-        # Admin functionality (if endpoints work)
-        print("👤 Testing Admin Access...")
+        # Authentication tests
+        print("🔐 Testing Authentication...")
         self.test_admin_login()
         
-        # CRYPTOSHIELD IA TESTING - COMPLETE SYSTEM
-        print("🛡️ Testing CryptoShield IA - Sistema Completo de Detección de Fraude...")
+        # Core API tests (only if admin login successful)
+        if self.admin_token:
+            print("\n🎯 AUTHENTICATION & DASHBOARD ENDPOINTS TESTING")
+            print("-" * 50)
+            
+            # Test the specific endpoints mentioned in the review request
+            self.test_auth_me_endpoint()
+            self.test_user_subscriptions_endpoint()
+            self.test_admin_stats_endpoint()
+            self.test_admin_users_endpoint()
+            
+            print("\n🌐 CORE API ENDPOINTS TESTING")
+            print("-" * 40)
+            self.test_countries_endpoint()
+            self.test_services_endpoint()
+            self.test_mongodb_connection()
+            
+            # Bot management tests
+            print("\n🤖 BOT MANAGEMENT TESTING")
+            print("-" * 30)
+            self.test_bots_status()
+            
+            # Momentum Predictor IA tests - FASE 2 (limited testing)
+            print("\n🎯 MOMENTUM PREDICTOR IA - HEALTH CHECK")
+            print("-" * 45)
+            self.test_momentum_health_check()
+            
+            # Test signal generation for BTC only (quick test)
+            self.test_momentum_signal_generation('BTC')
+            
+            # CryptoShield IA tests - Health check only
+            print("\n🛡️ CRYPTOSHIELD IA - HEALTH CHECK")
+            print("-" * 35)
+            self.test_cryptoshield_health_check()
         
-        # 1. Health Check
-        print("   🏥 Health Check...")
-        self.test_cryptoshield_health_check()
+        else:
+            print("❌ Skipping authenticated tests - Admin login failed")
         
-        # 2. Wallet Scanning (3 test wallets)
-        print("   👛 Wallet Scanning...")
-        wallet_names = ["Vitalik Buterin", "Binance Hot Wallet", "Null Address"]
-        for i, address in enumerate(self.test_wallets):
-            self.test_cryptoshield_wallet_scan(address, wallet_names[i])
-            time.sleep(1)  # Small delay between requests
-        
-        # 3. Transaction Verification (2 test transactions)
-        print("   🔄 Transaction Verification...")
-        tx_names = ["First Ethereum TX", "Invalid TX"]
-        for i, tx_hash in enumerate(self.test_tx_hashes):
-            self.test_cryptoshield_transaction_verify(tx_hash, tx_names[i])
-            time.sleep(1)
-        
-        # 4. Contract Scanning (USDT contract)
-        print("   📄 Contract Scanning...")
-        self.test_cryptoshield_contract_scan(self.test_contract)
-        
-        # 5. Scan History
-        print("   📚 Scan History...")
-        self.test_cryptoshield_scan_history()
-        
-        # 6. Statistics
-        print("   📊 Statistics...")
-        self.test_cryptoshield_stats()
-        
-        # 7. Validation and Error Handling
-        print("   ❌ Validation & Error Handling...")
-        self.test_cryptoshield_validation_errors()
-        
-        # 8. CRITICAL VALIDATIONS
-        print("   🔍 Critical System Validations...")
-        self.test_cryptoshield_etherscan_integration()
-        self.test_cryptoshield_risk_scoring_consistency()
-        
-        # Summary
+        # Print summary
         self.print_summary()
 
     def print_summary(self):

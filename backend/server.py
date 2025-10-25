@@ -8,6 +8,7 @@ import os
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone, timedelta
 import secrets
 

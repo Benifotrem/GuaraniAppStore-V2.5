@@ -1526,130 +1526,63 @@ class GuaraniBackendTester:
         print(f"   CryptoShield Health:                         {'✅ WORKING' if cryptoshield_health else '❌ FAILED'}")
         print()
         
-        print("🔧 CORE SYSTEM STATUS:")
-        print(f"   /api/countries: {'✅ WORKING' if countries_success else '❌ FAILED'}")
-        print(f"   /api/services:  {'✅ WORKING' if services_success else '❌ FAILED'}")
-        print(f"   Backend Status: {'✅ WORKING' if backend_success else '❌ FAILED'}")
-        print(f"   MongoDB Conn:   {'✅ WORKING' if mongodb_success else '❌ FAILED'}")
-        print()
-        
-        # Check critical verifications
-        if self.cryptoshield_scans:
-            print("✅ VERIFICACIONES CRÍTICAS COMPLETADAS:")
-            
-            # Check if we have scans from different types
-            wallet_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'wallet'])
-            tx_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'transaction'])
-            contract_scans_count = len([s for s in self.cryptoshield_scans if s.get('scan_type') == 'contract'])
-            
-            print(f"   ✅ Escaneos realizados: {len(self.cryptoshield_scans)} total")
-            print(f"      - Wallets: {wallet_scans_count}")
-            print(f"      - Transacciones: {tx_scans_count}")
-            print(f"      - Contratos: {contract_scans_count}")
-            
-            # Check sample data
-            if self.cryptoshield_scans:
-                sample_scan = self.cryptoshield_scans[0]
-                print(f"   ✅ Indicador is_mock = {sample_scan.get('is_mock', False)}")
-                print(f"   ✅ Model version: {sample_scan.get('model_version', 'N/A')}")
-                
-                # Check if we have realistic data
-                if sample_scan.get('scan_type') == 'wallet':
-                    balance = sample_scan.get('balance_eth', 0)
-                    tx_count = sample_scan.get('transaction_count', 0)
-                    print(f"   ✅ Datos reales desde Etherscan: Balance {balance:.4f} ETH, {tx_count:,} TXs")
-                
-                # Check risk assessment
-                risk_level = sample_scan.get('risk_level', 'unknown')
-                risk_score = sample_scan.get('risk_score', 0)
-                print(f"   ✅ Risk assessment: {risk_level.upper()} ({risk_score}/100)")
-                
-                # Check recommendations
-                recommendations = sample_scan.get('recommendations', [])
-                print(f"   ✅ Recomendaciones contextuales: {len(recommendations)} items")
-                
-                # Check date format
-                analyzed_at = sample_scan.get('analyzed_at') or sample_scan.get('verified_at', '')
-                iso_format = 'T' in analyzed_at and ('Z' in analyzed_at or '+' in analyzed_at)
-                print(f"   {'✅' if iso_format else '❌'} Formato fecha ISO 8601: {'Correcto' if iso_format else 'Incorrecto'}")
-            
-            # Check Etherscan integration
-            print(f"   {'✅' if etherscan_integration else '❌'} Integración Etherscan: {'Funcionando' if etherscan_integration else 'Fallando'}")
-            
-            # Check risk scoring consistency
-            print(f"   {'✅' if risk_scoring else '❌'} Risk scoring consistente: {'Sí' if risk_scoring else 'No'}")
-        
         if failed_tests > 0:
-            print()
             print("❌ FAILED TESTS:")
             for result in self.test_results:
                 if not result['success']:
                     print(f"   • {result['test']}: {result['details']}")
             print()
         
-        # Overall assessment for CryptoShield IA
-        cryptoshield_core_working = cryptoshield_health and wallet_scans and tx_verifications and contract_scan
-        cryptoshield_features_working = scan_history and stats and address_validation and tx_validation
-        cryptoshield_integrations_working = etherscan_integration and risk_scoring
-        core_working = countries_success and services_success and backend_success
+        # Overall assessment for authentication and dashboard endpoints
+        auth_endpoints_working = admin_login and auth_me and user_subscriptions and admin_stats and admin_users
+        core_endpoints_working = health_check and countries_success and services_success and backend_success and mongodb_success
         
         print("🏆 RESULTADO FINAL:")
-        if cryptoshield_core_working and cryptoshield_features_working and cryptoshield_integrations_working and core_working:
-            print("🎉 SUCCESS: CRYPTOSHIELD IA COMPLETAMENTE FUNCIONAL!")
-            print("   ✅ Todos los endpoints de CryptoShield funcionando")
-            print("   ✅ Integración real con Etherscan API operativa")
-            print("   ✅ Análisis de wallets, transacciones y contratos")
-            print("   ✅ Risk assessment realista y consistente")
-            print("   ✅ Validación de formato de addresses/hashes")
-            print("   ✅ Error handling robusto (400 Bad Request)")
-            print("   ✅ Guardado correcto en MongoDB")
-            print("   ✅ Historial y estadísticas funcionando")
-            print("   ✅ Recomendaciones contextuales al risk_level")
-            print("   ✅ Sistema backend estable")
-        elif cryptoshield_core_working and cryptoshield_features_working:
-            print("🟡 PARTIAL SUCCESS: CryptoShield funcionando, problemas en integraciones")
-            print("   ✅ Endpoints principales de CryptoShield operativos")
-            print("   ✅ Funcionalidades básicas funcionando")
-            if not etherscan_integration:
-                print("   ❌ Integración con Etherscan fallando")
-            if not risk_scoring:
-                print("   ❌ Risk scoring inconsistente")
-        elif cryptoshield_core_working:
-            print("🟠 PARTIAL SUCCESS: Endpoints básicos funcionando, faltan características")
-            print("   ✅ Endpoints básicos de CryptoShield funcionando")
-            if not cryptoshield_features_working:
-                print("   ❌ Historial, estadísticas o validaciones fallando")
-            if not cryptoshield_integrations_working:
-                print("   ❌ Integraciones críticas fallando")
+        if auth_endpoints_working and core_endpoints_working:
+            print("🎉 SUCCESS: AUTHENTICATION & DASHBOARD ENDPOINTS WORKING!")
+            print("   ✅ Admin login successful with JWT token")
+            print("   ✅ /api/auth/me returns admin user profile")
+            print("   ✅ /api/user/subscriptions returns user subscriptions")
+            print("   ✅ /api/admin/stats returns system statistics")
+            print("   ✅ /api/admin/users returns list of users")
+            print("   ✅ Core API endpoints functioning")
+            print("   ✅ Backend and database connectivity stable")
+        elif auth_endpoints_working:
+            print("🟡 PARTIAL SUCCESS: Authentication working, core endpoints have issues")
+            print("   ✅ All authentication and dashboard endpoints working")
+            if not core_endpoints_working:
+                print("   ❌ Some core API endpoints failing")
+        elif core_endpoints_working:
+            print("🟠 PARTIAL SUCCESS: Core endpoints working, authentication issues")
+            print("   ✅ Core API endpoints functioning")
+            if not auth_endpoints_working:
+                print("   ❌ Authentication or dashboard endpoints failing")
         else:
-            print("🚨 FAILURE: Problemas críticos en CryptoShield IA!")
-            if not cryptoshield_health:
-                print("   ❌ Health check fallando")
-            if not wallet_scans:
-                print("   ❌ Escaneo de wallets fallando")
-            if not tx_verifications:
-                print("   ❌ Verificación de transacciones fallando")
-            if not contract_scan:
-                print("   ❌ Escaneo de contratos fallando")
+            print("🚨 FAILURE: Critical issues with authentication and core endpoints!")
+            if not admin_login:
+                print("   ❌ Admin login failing")
+            if not auth_me:
+                print("   ❌ /api/auth/me endpoint failing")
+            if not user_subscriptions:
+                print("   ❌ /api/user/subscriptions endpoint failing")
+            if not admin_stats:
+                print("   ❌ /api/admin/stats endpoint failing")
+            if not admin_users:
+                print("   ❌ /api/admin/users endpoint failing")
         
         print()
-        print("📋 PRÓXIMOS PASOS:")
-        if cryptoshield_core_working and cryptoshield_features_working and cryptoshield_integrations_working:
-            print("   • CRYPTOSHIELD IA COMPLETADO - Sistema de detección de fraude operativo")
-            print("   • Listo para entrenar modelo Autoencoder real con datos históricos")
-            print("   • Bot de Telegram CryptoShield ya implementado")
-            print("   • Considerar implementar más exchanges (BSC, Polygon)")
-            print("   • Evaluar integración con servicios de threat intelligence")
-        elif cryptoshield_core_working:
-            print("   • Revisar integración con Etherscan API en cryptoshield_analyzer.py")
-            print("   • Verificar configuración de ETHERSCAN_API_KEY en .env")
-            print("   • Comprobar lógica de risk scoring en cryptoshield_service.py")
-            print("   • Validar guardado en MongoDB (colección cryptoshield_scans)")
+        print("📋 NEXT STEPS:")
+        if auth_endpoints_working and core_endpoints_working:
+            print("   • ✅ All requested endpoints are working correctly")
+            print("   • Admin can login and access dashboard endpoints")
+            print("   • User subscriptions endpoint returns expected data")
+            print("   • Admin statistics and user management working")
+            print("   • System ready for frontend integration")
         else:
-            print("   • Revisar logs del backend: tail -n 100 /var/log/supervisor/backend.*.log")
-            print("   • Verificar integración de cryptoshield_api.py en server.py")
-            print("   • Comprobar dependencias: web3.py, etherscan-python")
-            print("   • Validar configuración de MongoDB")
+            print("   • Review backend logs: tail -n 100 /var/log/supervisor/backend.*.log")
+            print("   • Check JWT token generation and validation")
+            print("   • Verify database connectivity and admin user creation")
+            print("   • Test endpoints manually with curl if needed")
 
 if __name__ == "__main__":
     tester = GuaraniBackendTester()

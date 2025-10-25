@@ -498,7 +498,18 @@ const LandingPage = ({ services }) => {
                   
                   {/* Button */}
                   <button 
-                    onClick={() => service.status !== 'coming_soon' && (isLoggedIn ? navigate('/dashboard') : setShowAuth(true))}
+                    onClick={() => {
+                      if (service.status === 'coming_soon') return;
+                      // Check if user is authenticated
+                      const token = localStorage.getItem('token');
+                      if (token) {
+                        // Navigate to checkout
+                        navigate(`/checkout/${service.id}`);
+                      } else {
+                        // Show login modal
+                        setShowAuth(true);
+                      }
+                    }}
                     disabled={service.status === 'coming_soon'}
                     className={`w-full py-3 px-4 rounded-xl font-bold transition ${
                       service.status === 'coming_soon' 

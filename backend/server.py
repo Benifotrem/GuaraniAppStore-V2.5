@@ -1246,6 +1246,51 @@ async def get_user_dashboard_stats(
         'recent_orders': [OrderResponse.model_validate(o) for o in recent_orders]
     }
 
+
+@api_router.get('/user/subscriptions')
+async def get_user_subscriptions(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get active subscriptions for current user"""
+    
+    # Get completed orders (active subscriptions)
+    orders_result = await db.execute(
+        select(Order).filter(
+            Order.user_id == current_user.id,
+            Order.payment_status == 'completed'
+        ).options(selectinload(Order.service))
+    )
+    orders = orders_result.scalars().all()
+    
+    # Transform orders to subscription format
+    subscriptions = []
+    for order in orders:
+        if order.service:
+            # Calculate expiration date based on plan type
+            expires_at = None
+            if order.completed_at:
+                if order.plan_type == 'monthly':
+                    from datetime import timedelta
+                    expires_at = order.completed_at + timedelta(days=30)
+                elif order.plan_type == 'annual':
+                    from datetime import timedelta
+                    expires_at = order.completed_at + timedelta(days=365)
+            
+            subscriptions.append({
+                'id': order.id,
+                'name': order.service.name,
+                'slug': order.service.slug,
+                'short_description': order.service.short_description,
+                'plan_type': order.plan_type,
+                'platform': order.platform,
+                'subscribed_at': order.completed_at.isoformat() if order.completed_at else None,
+                'expires_at': expires_at.isoformat() if expires_at else None,
+                'is_active': True
+            })
+    
+    return subscriptions
+
 @api_router.get('/user/transactions')
 async def get_user_transactions(
     current_user: User = Depends(get_current_user),

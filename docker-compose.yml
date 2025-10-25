@@ -1,7 +1,11 @@
 version: '3.8'
 
 services:
-  # MongoDB Database
+  # ============================================
+  # SERVICIOS PRINCIPALES - GUARANIAPPSTORE
+  # ============================================
+  
+  # MongoDB Database (App Principal)
   mongodb:
     image: mongo:7.0
     container_name: guarani_mongodb
@@ -21,25 +25,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis Cache (NUEVO - Ejemplo de contenedor adicional)
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: guarani_redis
-  #   restart: always
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - guarani_network
-  #   command: redis-server --appendonly yes
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-
-  # Backend API (FastAPI)
+  # Backend API Principal (FastAPI)
   backend:
     build:
       context: ./backend
@@ -68,7 +54,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend (React)
+  # Frontend Principal (React)
   frontend:
     build:
       context: ./frontend
@@ -89,7 +75,102 @@ services:
       timeout: 10s
       retries: 3
 
-  # Nginx Reverse Proxy (Opcional pero recomendado)
+  # ============================================
+  # SERVICIOS DEL AGENTE DEVELOPER
+  # ============================================
+
+  # PostgreSQL (Base de datos RAG del Agente)
+  postgres_rag:
+    image: postgres:15-alpine
+    container_name: soporte_postgres_rag
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-soporte_user_seguro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-contrasena_fuerte_aqui}
+      POSTGRES_DB: ${POSTGRES_DB:-soporte_db_rag}
+    volumes:
+      - postgres_rag_data:/var/lib/postgresql/data
+    networks:
+      - guarani_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-soporte_user_seguro}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend del Agente Developer (FastAPI/Python)
+  soporte_backend:
+    build:
+      context: ./soporte_agent
+      dockerfile: Dockerfile
+    container_name: soporte_backend
+    restart: always
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./soporte_agent:/app
+      - soporte_logs:/var/log
+    environment:
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-soporte_user_seguro}:${POSTGRES_PASSWORD:-contrasena_fuerte_aqui}@postgres_rag:5432/${POSTGRES_DB:-soporte_db_rag}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ANTHROPIC_API_KEY_FALLBACK=${ANTHROPIC_API_KEY_FALLBACK}
+      - OPENROUTER_MODEL_ID_HIGH=${OPENROUTER_MODEL_ID_HIGH:-anthropic/claude-sonnet-4.5}
+      - OPENROUTER_MODEL_ID_LOW=${OPENROUTER_MODEL_ID_LOW:-openai/gpt-4o-mini}
+      - OPENROUTER_EMBEDDING_MODEL=${OPENROUTER_EMBEDDING_MODEL:-text-embedding-ada-002}
+      - MONGO_URL=mongodb://mongodb:27017/guarani_appstore
+    depends_on:
+      postgres_rag:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - guarani_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Watcher Script (Verificación de Modelos)
+  model_watcher:
+    build:
+      context: ./watcher_script
+      dockerfile: Dockerfile
+    container_name: model_watcher
+    restart: always
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - CHECK_INTERVAL=${WATCHER_CHECK_INTERVAL:-3600}
+    networks:
+      - guarani_network
+    depends_on:
+      - soporte_backend
+
+  # Servicio de Migración (Ejecutar solo UNA VEZ con profile)
+  migration_tool:
+    build:
+      context: ./migration_scripts
+      dockerfile: Dockerfile
+    container_name: migration_tool
+    profiles: ["migration"]
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/guarani_appstore
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-soporte_user_seguro}:${POSTGRES_PASSWORD:-contrasena_fuerte_aqui}@postgres_rag:5432/${POSTGRES_DB:-soporte_db_rag}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      postgres_rag:
+        condition: service_healthy
+    networks:
+      - guarani_network
+
+  # ============================================
+  # NGINX REVERSE PROXY
+  # ============================================
+
   nginx:
     image: nginx:alpine
     container_name: guarani_nginx
@@ -104,6 +185,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - soporte_backend
     networks:
       - guarani_network
     healthcheck:
@@ -117,12 +199,14 @@ volumes:
     driver: local
   mongodb_config:
     driver: local
+  postgres_rag_data:
+    driver: local
   backend_logs:
+    driver: local
+  soporte_logs:
     driver: local
   nginx_logs:
     driver: local
-  # redis_data:
-  #   driver: local
 
 networks:
   guarani_network:

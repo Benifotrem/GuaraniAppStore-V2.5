@@ -551,6 +551,18 @@ frontend:
         agent: "main"
         comment: "✅ Bot de Telegram implementado completamente: Token configurado (MOMENTUM_BOT_TOKEN). Comandos implementados: /start (bienvenida + botones inline), /signal <SYMBOL> (generar señal), /history (últimas 5 señales), /stats <SYMBOL> (estadísticas), /help (ayuda). Botones inline: BTC, ETH, My Signals, Help. Formato Markdown con emojis (🟢 BUY, 🔴 SELL, 🟡 HOLD). Integración con MomentumPredictorService y MongoDB. Registro de usuarios en momentum_subscriptions. Guardado de señales con requested_by_chat_id. Script de inicio: start_momentum_bot.sh con permisos de ejecución. NOTA: Bot funcional pero requiere ejecución manual o supervisor para producción (event loop conflict con motor)."
 
+  - task: "Dashboard Navigation Between Admin and Client Panels"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/AdminDashboard.js, frontend/src/pages/ClientDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DASHBOARD NAVIGATION TESTING COMPLETADO CON ÉXITO TOTAL - 100% SUCCESS RATE. ESCENARIOS PROBADOS: 1) Login Flow: ✅ Admin login (admin@guaraniappstore.com / admin123) exitoso, ✅ JWT token almacenado correctamente, ✅ Navegación a admin dashboard funcional. 2) Admin Dashboard: ✅ Panel admin carga con header '🛡️ Panel Admin', ✅ Stats cards visibles (1 usuario, 6 servicios activos, 0 suscripciones), ✅ Tabs Resumen/Usuarios/Servicios operativos. 3) Ver como Cliente: ✅ Botón 'Ver como Cliente' encontrado en admin dashboard, ✅ Click navega correctamente a /client-dashboard, ✅ Client dashboard carga con contenido correcto (¡Bienvenido mensaje, GuaraniAppStore header). 4) Panel Admin Button: ✅ Botón '🛡️ Panel Admin' visible en client dashboard para usuarios admin, ✅ Click navega correctamente de vuelta a /admin-dashboard, ✅ Admin dashboard se recarga correctamente. 5) Round-trip Testing: ✅ Admin → Client navigation working, ✅ Client → Admin navigation working, ✅ Ambas direcciones funcionan perfectamente. VERIFICACIONES CRÍTICAS: ✅ Autenticación admin operativa, ✅ Navegación suave en ambas direcciones, ✅ Ambos dashboards cargan con contenido correcto, ✅ Usuario admin puede cambiar entre vistas fácilmente, ✅ Botones contextuales visibles según rol de usuario. SISTEMA COMPLETAMENTE OPERATIVO para navegación entre paneles admin y cliente."
+
 agent_communication:
   - agent: "main"
     message: "🎯 MOMENTUM PREDICTOR IA - FASE 2 IMPLEMENTACIÓN COMPLETADA

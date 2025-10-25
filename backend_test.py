@@ -1747,4 +1747,5 @@ class GuaraniBackendTester:
 
 if __name__ == "__main__":
     tester = GuaraniBackendTester()
-    tester.run_all_tests()
+    # Run the specific authentication and dashboard tests as requested
+    tester.run_authentication_tests()

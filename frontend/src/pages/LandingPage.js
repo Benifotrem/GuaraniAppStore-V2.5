@@ -69,21 +69,31 @@ const LandingPage = ({ services }) => {
     setErrorMsg('');
 
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const response = await axios.post(`${API}${endpoint}`, formData);
-
-      if (!isLogin) {
-        alert('¡Cuenta creada! Por favor verifica tu email antes de iniciar sesión.');
-        setShowAuth(false);
-        return;
+      if (isLogin) {
+        // Use AuthContext for login
+        const result = await authLogin(formData.email, formData.password);
+        if (result.success) {
+          setShowAuth(false);
+          // Navigate based on user role
+          if (user?.is_admin || user?.role === 'admin') {
+            navigate('/admin-dashboard');
+          } else {
+            navigate('/client-dashboard');
+          }
+        } else {
+          setErrorMsg(result.error || 'Error de autenticación');
+        }
+      } else {
+        // Use AuthContext for register
+        const result = await authRegister(formData.email, formData.password, formData.name);
+        if (result.success) {
+          setShowAuth(false);
+          // Navigate to client dashboard after registration
+          navigate('/client-dashboard');
+        } else {
+          setErrorMsg(result.error || 'Error en el registro');
+        }
       }
-
-      // Store token and user
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      setShowAuth(false);
-      navigate('/dashboard');
     } catch (e) {
       const error = e.response?.data?.detail || (isLogin ? 'Error de autenticación' : 'Error en el registro');
       setErrorMsg(error);

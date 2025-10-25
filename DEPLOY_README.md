@@ -188,7 +188,8 @@ docker-compose restart frontend
 
 ```bash
 # Si usas Git
-git pull origin main
+git clone https://github.com/tu-usuario/GuaraniAppStore-V2.5.git
+cd GuaraniAppStore-V2.5
 
 # Rebuild y restart
 docker-compose build

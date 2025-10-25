@@ -5,6 +5,7 @@ import './App.css';
 import LandingPage from './pages/LandingPage';
 import CheckoutPage from './pages/CheckoutPage';
 import Dashboard from './pages/Dashboard';
+import SuiteCryptoDashboard from './pages/SuiteCryptoDashboard';
 import AdminPanel from './pages/AdminPanel';
 import CryptoSuite from './pages/services/CryptoSuite';
 import AsistenteDirectivos from './pages/services/AsistenteDirectivos';

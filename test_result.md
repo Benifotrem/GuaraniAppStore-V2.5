@@ -344,8 +344,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "CryptoShield IA - Fase 1: Integración y Lógica MOCK"
-  stuck_tasks: []
+    - "Authentication and Dashboard Endpoints Testing"
+  stuck_tasks:
+    - "Authentication and Dashboard Endpoints Testing"
   test_all: false
   test_priority: "high_first"
 

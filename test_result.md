@@ -675,6 +675,33 @@ RECOMENDACIÓN: FASE 2 COMPLETADA - Proceder con implementación de CryptoShield
 • Listo para entrenar modelo Autoencoder real
 
 RECOMENDACIÓN: CRYPTOSHIELD IA COMPLETADO - Sistema de detección de fraude operativo y listo para producción"
+  - agent: "testing"
+    message: "🔐 AUTHENTICATION & DASHBOARD ENDPOINTS TESTING COMPLETADO - PROBLEMA CRÍTICO IDENTIFICADO
+
+✅ RESULTADOS DE TESTING:
+• POST /api/auth/login: ✅ FUNCIONANDO (admin@guaraniappstore.com / admin123)
+• GET /api/auth/me: ❌ FALLA (500 Internal Server Error)
+• GET /api/user/subscriptions: ❌ FALLA (500 Internal Server Error)  
+• GET /api/admin/stats: ❌ FALLA (500 Internal Server Error)
+• GET /api/admin/users: ❌ FALLA (500 Internal Server Error)
+
+❌ CAUSA RAÍZ IDENTIFICADA:
+• Sistema configurado para MongoDB-only mode (PostgreSQL no instalado)
+• Login funciona porque tiene fallback a MongoDB en server.py líneas 250-287
+• Endpoints protegidos fallan porque get_current_user() en auth.py requiere PostgreSQL
+• Error: 'OSError: [Errno 111] Connect call failed ('127.0.0.1', 5432)'
+
+🔧 SOLUCIÓN REQUERIDA:
+• Implementar fallback a MongoDB en auth.py para get_current_user()
+• O instalar y configurar PostgreSQL
+• Endpoints adicionales también afectados: bots management (500 errors)
+
+✅ ENDPOINTS FUNCIONANDO:
+• Core API: /health, /countries, /services (MongoDB)
+• Momentum Predictor: /momentum/health, /momentum/signal/BTC
+• CryptoShield: /cryptoshield/health
+
+PRIORIDAD ALTA: Resolver autenticación para habilitar dashboard endpoints"
   - agent: "main"
     message: "🎯 MOMENTUM PREDICTOR IA - FASE 1 INTEGRACIÓN COMPLETADA
 

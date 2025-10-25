@@ -96,11 +96,11 @@ sudo ufw enable
 ```bash
 # Opción 1: Clonar desde GitHub (recomendado)
 cd /opt
-sudo git clone https://github.com/tu-usuario/guaraniappstore.git
-cd guaraniappstore
+sudo git clone https://github.com/tu-usuario/GuaraniAppStore-V2.5.git
+cd GuaraniAppStore-V2.5
 
 # Opción 2: Transferir archivos con SCP
-scp -r /ruta/local/app usuario@ip-vps:/opt/guaraniappstore
+scp -r /ruta/local/app usuario@ip-vps:/opt/GuaraniAppStore-V2.5
 ```
 
 ### Configurar variables de entorno

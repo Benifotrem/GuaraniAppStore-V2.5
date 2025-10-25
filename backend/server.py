@@ -1579,56 +1579,95 @@ async def get_admin_stats(
 ):
     """Get admin dashboard statistics"""
     
-    # Total users
-    users_result = await db.execute(select(User))
-    total_users = len(users_result.scalars().all())
-    
-    # Total orders
-    orders_result = await db.execute(select(Order))
-    all_orders = orders_result.scalars().all()
-    total_orders = len(all_orders)
-    
-    # Orders by status
-    completed_orders = len([o for o in all_orders if o.payment_status == 'completed'])
-    pending_orders = len([o for o in all_orders if o.payment_status == 'pending'])
-    failed_orders = len([o for o in all_orders if o.payment_status == 'failed'])
-    
-    # Total revenue (completed orders)
-    total_revenue = sum([o.final_price for o in all_orders if o.payment_status == 'completed'])
-    
-    # Revenue by payment method
-    revenue_by_method = {}
-    for order in all_orders:
-        if order.payment_status == 'completed':
-            method = order.payment_method
-            if method not in revenue_by_method:
-                revenue_by_method[method] = 0
-            revenue_by_method[method] += order.final_price
-    
-    # Total services
-    services_result = await db.execute(select(Service))
-    total_services = len(services_result.scalars().all())
-    
-    return {
-        'users': {
-            'total': total_users,
-            'verified': len([u for u in users_result.scalars().all() if u.is_verified]),
-            'with_2fa': len([u for u in users_result.scalars().all() if u.two_factor_enabled])
-        },
-        'orders': {
-            'total': total_orders,
-            'completed': completed_orders,
-            'pending': pending_orders,
-            'failed': failed_orders
-        },
-        'revenue': {
-            'total': total_revenue,
-            'by_method': revenue_by_method
-        },
-        'services': {
-            'total': total_services
+    try:
+        # Try PostgreSQL first
+        # Total users
+        users_result = await db.execute(select(User))
+        all_users = users_result.scalars().all()
+        total_users = len(all_users)
+        
+        # Total orders
+        orders_result = await db.execute(select(Order))
+        all_orders = orders_result.scalars().all()
+        total_orders = len(all_orders)
+        
+        # Orders by status
+        completed_orders = len([o for o in all_orders if o.payment_status == 'completed'])
+        pending_orders = len([o for o in all_orders if o.payment_status == 'pending'])
+        failed_orders = len([o for o in all_orders if o.payment_status == 'failed'])
+        
+        # Total revenue (completed orders)
+        total_revenue = sum([o.final_price for o in all_orders if o.payment_status == 'completed'])
+        
+        # Revenue by payment method
+        revenue_by_method = {}
+        for order in all_orders:
+            if order.payment_status == 'completed':
+                method = order.payment_method
+                if method not in revenue_by_method:
+                    revenue_by_method[method] = 0
+                revenue_by_method[method] += order.final_price
+        
+        # Total services
+        services_result = await db.execute(select(Service))
+        total_services = len(services_result.scalars().all())
+        
+        return {
+            'users': {
+                'total': total_users,
+                'verified': len([u for u in all_users if u.is_verified]),
+                'with_2fa': len([u for u in all_users if u.two_factor_enabled])
+            },
+            'orders': {
+                'total': total_orders,
+                'completed': completed_orders,
+                'pending': pending_orders,
+                'failed': failed_orders
+            },
+            'revenue': {
+                'total': total_revenue,
+                'by_method': revenue_by_method
+            },
+            'services': {
+                'total': total_services
+            }
         }
-    }
+        
+    except Exception as e:
+        # MongoDB fallback
+        logger.warning(f"PostgreSQL not available for admin stats, using MongoDB fallback: {str(e)}")
+        
+        # Get users from MongoDB
+        mongo_users = await users_collection.find().to_list(length=1000)
+        total_users = len(mongo_users)
+        verified_users = len([u for u in mongo_users if u.get('is_verified', False)])
+        users_with_2fa = len([u for u in mongo_users if u.get('two_factor_enabled', False)])
+        
+        # Get services from MongoDB
+        mongo_services = await services_collection.find().to_list(length=100)
+        total_services = len(mongo_services)
+        
+        # Orders and revenue are 0 in MongoDB-only mode (no orders collection yet)
+        return {
+            'users': {
+                'total': total_users,
+                'verified': verified_users,
+                'with_2fa': users_with_2fa
+            },
+            'orders': {
+                'total': 0,
+                'completed': 0,
+                'pending': 0,
+                'failed': 0
+            },
+            'revenue': {
+                'total': 0.0,
+                'by_method': {}
+            },
+            'services': {
+                'total': total_services
+            }
+        }
 
 @api_router.get('/admin/users')
 async def get_all_users(

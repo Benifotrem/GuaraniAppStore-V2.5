@@ -30,7 +30,45 @@ import BlogAdminPanel from './pages/BlogAdminPanel';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-function App() {
+// Componente para proteger rutas que requieren autenticación
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Cargando...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Componente para proteger rutas de admin
+const AdminRoute = ({ children }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Cargando...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user?.is_admin) {
+    return <Navigate to="/client-dashboard" replace />;
+  }
+
+  return children;
+};
+
+function AppContent() {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
@@ -74,30 +112,88 @@ function App() {
   };
 
   return (
+    <Routes>
+      <Route path="/" element={<LandingPage services={services} />} />
+      <Route path="/checkout/:serviceId" element={<CheckoutPage />} />
+      
+      {/* Rutas protegidas - requieren autenticación */}
+      <Route 
+        path="/client-dashboard" 
+        element={
+          <ProtectedRoute>
+            <ClientDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/dashboard/suite-crypto" 
+        element={
+          <ProtectedRoute>
+            <SuiteCryptoDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rutas de admin - requieren autenticación y rol admin */}
+      <Route 
+        path="/admin-dashboard" 
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <AdminRoute>
+            <AdminPanel />
+          </AdminRoute>
+        } 
+      />
+      <Route 
+        path="/admin/blog" 
+        element={
+          <AdminRoute>
+            <BlogAdminPanel />
+          </AdminRoute>
+        } 
+      />
+      
+      {/* Rutas públicas */}
+      <Route path="/services/crypto-suite" element={<CryptoSuite />} />
+      <Route path="/services/asistente-directivos" element={<AsistenteDirectivos />} />
+      <Route path="/services/preseleccion-curricular" element={<PreseleccionCurricular />} />
+      <Route path="/services/organizador-facturas" element={<OrganizadorFacturas />} />
+      <Route path="/services/organizador-agenda" element={<OrganizadorAgenda />} />
+      <Route path="/services/consultoria-tecnica" element={<ConsultoriaTecnica />} />
+      <Route path="/services/generador-blogs" element={<GeneradorBlogs />} />
+      <Route path="/services/automatizacion-ecommerce" element={<AutomatizacionEcommerce />} />
+      <Route path="/services/automatizacion-redes-sociales" element={<AutomatizacionRedesSociales />} />
+      <Route path="/services/prospeccion-comercial" element={<ProspeccionComercial />} />
+      <Route path="/services/agente-ventas-ia" element={<AgenteVentasIA />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/terms" element={<TermsConditions />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/blog" element={<Blog />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage services={services} />} />
-        <Route path="/checkout/:serviceId" element={<CheckoutPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/suite-crypto" element={<SuiteCryptoDashboard />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/services/crypto-suite" element={<CryptoSuite />} />
-        <Route path="/services/asistente-directivos" element={<AsistenteDirectivos />} />
-        <Route path="/services/preseleccion-curricular" element={<PreseleccionCurricular />} />
-        <Route path="/services/organizador-facturas" element={<OrganizadorFacturas />} />
-        <Route path="/services/organizador-agenda" element={<OrganizadorAgenda />} />
-        <Route path="/services/consultoria-tecnica" element={<ConsultoriaTecnica />} />
-        <Route path="/services/generador-blogs" element={<GeneradorBlogs />} />
-        <Route path="/services/automatizacion-ecommerce" element={<AutomatizacionEcommerce />} />
-        <Route path="/services/automatizacion-redes-sociales" element={<AutomatizacionRedesSociales />} />
-        <Route path="/services/prospeccion-comercial" element={<ProspeccionComercial />} />
-        <Route path="/services/agente-ventas-ia" element={<AgenteVentasIA />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/terms" element={<TermsConditions />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/admin/blog" element={<BlogAdminPanel />} />
-      </Routes>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

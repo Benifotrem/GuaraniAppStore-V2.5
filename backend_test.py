@@ -1253,6 +1253,164 @@ class GuaraniBackendTester:
             self.log_test("CryptoShield Risk Scoring", False, 
                         f"Scoring inconsistencies: {'; '.join(scoring_errors[:3])}")
 
+    def test_auth_me_endpoint(self):
+        """Test /api/auth/me endpoint with valid admin token"""
+        if not self.admin_token:
+            self.log_test("Auth Me Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/auth/me')
+        
+        if success and isinstance(data, dict):
+            # Check required user fields
+            required_fields = ['id', 'email', 'full_name', 'role', 'is_active']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if not missing_fields:
+                email = data.get('email')
+                role = data.get('role')
+                is_active = data.get('is_active')
+                full_name = data.get('full_name')
+                
+                # Validate admin user data
+                if (email == self.admin_email and 
+                    role == 'admin' and 
+                    is_active == True):
+                    self.log_test("Auth Me Endpoint", True, 
+                                f"Admin user profile retrieved: {full_name} ({email}), Role: {role}")
+                else:
+                    self.log_test("Auth Me Endpoint", False, 
+                                f"Unexpected user data - Email: {email}, Role: {role}, Active: {is_active}")
+            else:
+                self.log_test("Auth Me Endpoint", False, f"Missing user fields: {missing_fields}")
+        else:
+            self.log_test("Auth Me Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_user_subscriptions_endpoint(self):
+        """Test /api/user/subscriptions endpoint - verify it returns subscriptions for logged in user"""
+        if not self.admin_token:
+            self.log_test("User Subscriptions Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/user/subscriptions')
+        
+        if success and isinstance(data, list):
+            # Subscriptions should be a list (can be empty for new admin user)
+            subscription_count = len(data)
+            
+            if subscription_count == 0:
+                self.log_test("User Subscriptions Endpoint", True, 
+                            "No subscriptions found for admin user (expected for new account)")
+            else:
+                # Check structure of first subscription
+                first_sub = data[0]
+                required_fields = ['id', 'name', 'plan_type', 'is_active']
+                missing_fields = [field for field in required_fields if field not in first_sub]
+                
+                if not missing_fields:
+                    self.log_test("User Subscriptions Endpoint", True, 
+                                f"Found {subscription_count} subscriptions with correct structure")
+                    # Log subscription details
+                    for sub in data[:3]:  # Show first 3
+                        name = sub.get('name', 'Unknown')
+                        plan = sub.get('plan_type', 'Unknown')
+                        active = sub.get('is_active', False)
+                        print(f"   Subscription: {name} ({plan}) - Active: {active}")
+                else:
+                    self.log_test("User Subscriptions Endpoint", False, 
+                                f"Subscriptions missing required fields: {missing_fields}")
+        else:
+            self.log_test("User Subscriptions Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_admin_stats_endpoint(self):
+        """Test /api/admin/stats endpoint - verify it returns statistics"""
+        if not self.admin_token:
+            self.log_test("Admin Stats Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/admin/stats')
+        
+        if success and isinstance(data, dict):
+            # Check required stats sections
+            required_sections = ['users', 'orders', 'revenue', 'services']
+            missing_sections = [section for section in required_sections if section not in data]
+            
+            if not missing_sections:
+                users_stats = data.get('users', {})
+                orders_stats = data.get('orders', {})
+                revenue_stats = data.get('revenue', {})
+                services_stats = data.get('services', {})
+                
+                # Validate users stats
+                users_valid = all(field in users_stats for field in ['total', 'verified', 'with_2fa'])
+                orders_valid = all(field in orders_stats for field in ['total', 'completed', 'pending', 'failed'])
+                revenue_valid = 'total' in revenue_stats and 'by_method' in revenue_stats
+                services_valid = 'total' in services_stats
+                
+                if all([users_valid, orders_valid, revenue_valid, services_valid]):
+                    total_users = users_stats.get('total', 0)
+                    total_orders = orders_stats.get('total', 0)
+                    total_revenue = revenue_stats.get('total', 0)
+                    total_services = services_stats.get('total', 0)
+                    
+                    self.log_test("Admin Stats Endpoint", True, 
+                                f"Stats retrieved - Users: {total_users}, Orders: {total_orders}, "
+                                f"Revenue: {total_revenue:,.0f} PYG, Services: {total_services}")
+                else:
+                    validation_errors = []
+                    if not users_valid: validation_errors.append("Invalid users stats structure")
+                    if not orders_valid: validation_errors.append("Invalid orders stats structure")
+                    if not revenue_valid: validation_errors.append("Invalid revenue stats structure")
+                    if not services_valid: validation_errors.append("Invalid services stats structure")
+                    
+                    self.log_test("Admin Stats Endpoint", False, "; ".join(validation_errors))
+            else:
+                self.log_test("Admin Stats Endpoint", False, f"Missing stats sections: {missing_sections}")
+        else:
+            self.log_test("Admin Stats Endpoint", False, f"Status code: {status_code}", data)
+
+    def test_admin_users_endpoint(self):
+        """Test /api/admin/users endpoint - verify it returns list of users"""
+        if not self.admin_token:
+            self.log_test("Admin Users Endpoint", False, "No admin token available")
+            return
+            
+        success, data, status_code = self.make_request('GET', '/admin/users?limit=10')
+        
+        if success and isinstance(data, list):
+            user_count = len(data)
+            
+            if user_count > 0:
+                # Check structure of first user
+                first_user = data[0]
+                required_fields = ['id', 'email', 'full_name', 'role', 'is_active', 'created_at']
+                missing_fields = [field for field in required_fields if field not in first_user]
+                
+                if not missing_fields:
+                    # Verify admin user is in the list
+                    admin_found = any(user.get('email') == self.admin_email for user in data)
+                    
+                    if admin_found:
+                        self.log_test("Admin Users Endpoint", True, 
+                                    f"Found {user_count} users including admin user")
+                        
+                        # Show sample user data
+                        for user in data[:3]:  # Show first 3 users
+                            email = user.get('email', 'Unknown')
+                            role = user.get('role', 'Unknown')
+                            active = user.get('is_active', False)
+                            print(f"   User: {email} - Role: {role}, Active: {active}")
+                    else:
+                        self.log_test("Admin Users Endpoint", False, 
+                                    f"Admin user {self.admin_email} not found in users list")
+                else:
+                    self.log_test("Admin Users Endpoint", False, 
+                                f"Users missing required fields: {missing_fields}")
+            else:
+                self.log_test("Admin Users Endpoint", False, "No users found in system")
+        else:
+            self.log_test("Admin Users Endpoint", False, f"Status code: {status_code}", data)
+
     def run_all_tests(self):
         """Run all backend tests focusing on CryptoShield IA"""
         print("=" * 70)

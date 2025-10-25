@@ -91,6 +91,15 @@ const ClientDashboard = () => {
               <p className="text-white font-semibold text-sm">{user?.full_name || user?.email}</p>
               <p className="text-white/50 text-xs">{user?.email}</p>
             </div>
+            {/* Admin panel button - only visible for admins */}
+            {(user?.is_admin || user?.role === 'admin') && (
+              <button
+                onClick={() => navigate('/admin-dashboard')}
+                className="bg-purple-500/20 text-purple-400 px-4 py-2 rounded-lg hover:bg-purple-500/30 transition text-sm font-medium"
+              >
+                🛡️ Panel Admin
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition text-sm font-medium"

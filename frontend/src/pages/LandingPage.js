@@ -12,7 +12,7 @@ const API = `${BACKEND_URL}/api`;
 
 const LandingPage = ({ services }) => {
   const navigate = useNavigate();
-  const { login: authLogin, register: authRegister, user } = useAuth();
+  const { login: authLogin, register: authRegister, user, isAuthenticated } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
@@ -30,9 +30,6 @@ const LandingPage = ({ services }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [countries, setCountries] = useState([]);
-
-  // Función para verificar si está logueado
-  const isLoggedIn = localStorage.getItem('token') !== null;
 
   useEffect(() => {
     fetchCountries();

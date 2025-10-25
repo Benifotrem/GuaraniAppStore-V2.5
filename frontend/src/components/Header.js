@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
 const Header = ({ onLoginClick, onTrialClick }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, user, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,23 +17,14 @@ const Header = ({ onLoginClick, onTrialClick }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    // Verificar si hay token en localStorage
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      setIsLoggedIn(!!token);
-    };
-
-    checkAuth();
-    
-    // Escuchar cambios en localStorage (para detectar login/logout)
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
-  }, []);
-
   const handleLogin = () => {
-    if (isLoggedIn) {
-      navigate('/dashboard');
+    if (isAuthenticated && user) {
+      // Redirect based on user role
+      if (user.is_admin || user.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/client-dashboard');
+      }
     } else if (onLoginClick) {
       onLoginClick();
     }

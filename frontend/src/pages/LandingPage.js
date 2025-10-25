@@ -495,13 +495,21 @@ const LandingPage = ({ services }) => {
                   
                   {/* Button */}
                   <button 
-                    onClick={() => {
+                    onClick={(e) => {
+                      console.log('Suscribirse clicked', { 
+                        status: service.status, 
+                        isAuthenticated, 
+                        serviceId: service.id,
+                        serviceName: service.name 
+                      });
                       if (service.status === 'coming_soon') return;
                       // Check if user is authenticated using AuthContext
                       if (isAuthenticated) {
+                        console.log('Navigating to checkout:', `/checkout/${service.id}`);
                         // Navigate to checkout
                         navigate(`/checkout/${service.id}`);
                       } else {
+                        console.log('Showing auth modal');
                         // Show login modal
                         setShowAuth(true);
                       }

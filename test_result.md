@@ -344,7 +344,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Authentication and Dashboard Flow Testing - COMPLETED"
+    - "Subscription Flow Testing - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

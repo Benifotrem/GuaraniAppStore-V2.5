@@ -1,125 +1,166 @@
 #!/bin/bash
 
-# ============================================
-# GuaraniAppStore - Deployment Script
-# ============================================
+###############################################################################
+# SCRIPT DE DEPLOYMENT - GuaraniAppStore V2.5
+# Uso: ./deploy.sh [production|staging|local]
+###############################################################################
 
-set -e
+set -e  # Exit on error
 
-echo "🚀 Iniciando deployment de GuaraniAppStore..."
-
-# Colors
+# Colores para output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Check if running as root
-if [ "$EUID" -eq 0 ]; then 
-    echo -e "${RED}❌ No ejecutar como root. Usa un usuario con sudo.${NC}"
+# Función para logs
+log_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+log_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+log_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Banner
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║     GuaraniAppStore V2.5 - Script de Deployment         ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo ""
+
+# Verificar entorno
+ENVIRONMENT=${1:-production}
+log_info "Entorno de deployment: $ENVIRONMENT"
+echo ""
+
+# Cambiar al directorio webapp
+cd "$(dirname "$0")/webapp" || exit 1
+
+###############################################################################
+# PASO 1: VERIFICACIONES PREVIAS
+###############################################################################
+echo "═══════════════════════════════════════════════════════════"
+echo "PASO 1: Verificaciones Previas"
+echo "═══════════════════════════════════════════════════════════"
+
+# Verificar PHP
+log_info "Verificando PHP..."
+if ! command -v php &> /dev/null; then
+    log_error "PHP no está instalado"
     exit 1
 fi
 
-# Check if .env exists
-if [ ! -f ".env" ]; then
-    echo -e "${RED}❌ Archivo .env no encontrado en la raíz del proyecto${NC}"
-    echo "Copia .env.example a .env y configura las variables"
+PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+log_success "PHP $PHP_VERSION detectado"
+
+# Verificar Composer
+log_info "Verificando Composer..."
+if ! command -v composer &> /dev/null; then
+    log_error "Composer no está instalado"
     exit 1
 fi
+log_success "Composer instalado"
 
-if [ ! -f "backend/.env" ]; then
-    echo -e "${RED}❌ Archivo backend/.env no encontrado${NC}"
-    echo "Copia .env.example a backend/.env y configura las variables"
-    exit 1
-fi
+echo ""
 
-# Check Docker
-if ! command -v docker &> /dev/null; then
-    echo -e "${RED}❌ Docker no está instalado${NC}"
-    exit 1
-fi
+###############################################################################
+# PASO 2: INSTALACIÓN DE DEPENDENCIAS
+###############################################################################
+echo "═══════════════════════════════════════════════════════════"
+echo "PASO 2: Instalación de Dependencias"
+echo "═══════════════════════════════════════════════════════════"
 
-if ! command -v docker-compose &> /dev/null; then
-    echo -e "${RED}❌ Docker Compose no está instalado${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✅ Verificaciones iniciales completadas${NC}"
-
-# Stop existing containers
-echo -e "${YELLOW}🛑 Deteniendo contenedores existentes...${NC}"
-docker-compose down || true
-
-# Pull latest images (if using pre-built images)
-# docker-compose pull
-
-# Build images
-echo -e "${YELLOW}🏗️  Construyendo imágenes Docker...${NC}"
-docker-compose build --no-cache
-
-# Start services
-echo -e "${YELLOW}▶️  Iniciando servicios...${NC}"
-docker-compose up -d
-
-# Wait for services to be healthy
-echo -e "${YELLOW}⏳ Esperando que los servicios estén listos...${NC}"
-sleep 10
-
-# Check services status
-echo -e "${YELLOW}🔍 Verificando estado de servicios...${NC}"
-docker-compose ps
-
-# Check MongoDB
-echo -e "${YELLOW}🔍 Verificando MongoDB...${NC}"
-if docker exec guarani_mongodb mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ MongoDB está funcionando${NC}"
+log_info "Instalando dependencias de Composer..."
+if [ "$ENVIRONMENT" = "production" ]; then
+    composer install --optimize-autoloader --no-dev --no-interaction
 else
-    echo -e "${RED}❌ MongoDB no responde${NC}"
-    exit 1
+    composer install --optimize-autoloader
+fi
+log_success "Dependencias de Composer instaladas"
+
+if command -v npm &> /dev/null; then
+    log_info "Instalando dependencias de NPM..."
+    npm install
+    log_success "Dependencias de NPM instaladas"
+
+    log_info "Compilando assets..."
+    npm run build
+    log_success "Assets compilados"
 fi
 
-# Check Backend
-echo -e "${YELLOW}🔍 Verificando Backend...${NC}"
-sleep 5
-if curl -f http://localhost:8001/health > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ Backend está funcionando${NC}"
+echo ""
+
+###############################################################################
+# PASO 3: CONFIGURACIÓN DEL ENTORNO
+###############################################################################
+echo "═══════════════════════════════════════════════════════════"
+echo "PASO 3: Configuración del Entorno"
+echo "═══════════════════════════════════════════════════════════"
+
+# Verificar .env
+if [ ! -f .env ]; then
+    log_warning ".env no existe. Copiando desde .env.example..."
+    cp .env.example .env
+    log_success ".env creado"
+
+    # Generar APP_KEY
+    log_info "Generando APP_KEY..."
+    php artisan key:generate --force
+    log_success "APP_KEY generada"
 else
-    echo -e "${RED}❌ Backend no responde${NC}"
-    echo "Logs del backend:"
-    docker-compose logs --tail=50 backend
-    exit 1
+    log_success ".env ya existe"
 fi
 
-# Check Frontend
-echo -e "${YELLOW}🔍 Verificando Frontend...${NC}"
-if curl -f http://localhost:3000 > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ Frontend está funcionando${NC}"
+echo ""
+
+###############################################################################
+# PASO 4: PERMISOS DE DIRECTORIOS
+###############################################################################
+echo "═══════════════════════════════════════════════════════════"
+echo "PASO 4: Configuración de Permisos"
+echo "═══════════════════════════════════════════════════════════"
+
+log_info "Configurando permisos de storage y cache..."
+chmod -R 755 storage bootstrap/cache
+chmod -R 775 storage/logs
+
+log_success "Permisos configurados"
+
+# Storage link
+if [ ! -L public/storage ]; then
+    log_info "Creando symlink de storage..."
+    php artisan storage:link
+    log_success "Symlink creado"
 else
-    echo -e "${RED}❌ Frontend no responde${NC}"
-    docker-compose logs --tail=50 frontend
-    exit 1
+    log_success "Symlink de storage ya existe"
 fi
 
-# Initialize database (optional - uncomment if needed)
-# echo -e "${YELLOW}🗄️  Inicializando base de datos...${NC}"
-# docker exec -it guarani_backend python init_services_mongo_v2.py
+echo ""
 
+###############################################################################
+# RESUMEN FINAL
+###############################################################################
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║                  DEPLOYMENT BÁSICO COMPLETADO            ║"
+echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}🎉 Deployment completado exitosamente!${NC}"
-echo -e "${GREEN}========================================${NC}"
+
+log_success "Aplicación preparada en modo: $ENVIRONMENT"
 echo ""
-echo "📊 URLs de acceso:"
-echo "  - Frontend: http://localhost:3000"
-echo "  - Backend API: http://localhost:8001"
-echo "  - Health Check: http://localhost:8001/health"
+
+echo "Próximos pasos:"
+echo "1. Configura tu .env con las credenciales de BD"
+echo "2. Ejecuta: php artisan migrate --seed"
+echo "3. Ejecuta: php artisan telegram:setup-webhooks"
 echo ""
-echo "📝 Ver logs:"
-echo "  docker-compose logs -f"
-echo ""
-echo "🔄 Reiniciar servicios:"
-echo "  docker-compose restart"
-echo ""
-echo "🛑 Detener servicios:"
-echo "  docker-compose down"
-echo ""
+
+log_success "¡Listo para continuar! 🎉"

@@ -53,4 +53,31 @@ Route::get('/payments/pagopar/cancel', [PaymentController::class, 'pagoparCancel
 Route::get('/payments/bancard/success', [PaymentController::class, 'bancardSuccess'])->name('payments.bancard.success');
 Route::get('/payments/bancard/cancel', [PaymentController::class, 'bancardCancel'])->name('payments.bancard.cancel');
 
+// Admin Routes (protected by admin middleware)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\AdminController::class, 'index'])->name('dashboard');
+
+    // Users Management
+    Route::get('/users', [\App\Http\Controllers\Admin\AdminController::class, 'users'])->name('users');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\AdminController::class, 'userEdit'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\AdminController::class, 'userUpdate'])->name('users.update');
+
+    // Services Management
+    Route::get('/services', [\App\Http\Controllers\Admin\AdminController::class, 'services'])->name('services');
+    Route::get('/services/{id}/edit', [\App\Http\Controllers\Admin\AdminController::class, 'serviceEdit'])->name('services.edit');
+    Route::put('/services/{id}', [\App\Http\Controllers\Admin\AdminController::class, 'serviceUpdate'])->name('services.update');
+
+    // Payments Management
+    Route::get('/payments', [\App\Http\Controllers\Admin\AdminController::class, 'payments'])->name('payments');
+
+    // Payment Gateways
+    Route::get('/gateways', [\App\Http\Controllers\Admin\AdminController::class, 'gateways'])->name('gateways');
+    Route::put('/gateways/{id}', [\App\Http\Controllers\Admin\AdminController::class, 'gatewayUpdate'])->name('gateways.update');
+
+    // API Credentials
+    Route::get('/api-credentials', [\App\Http\Controllers\Admin\AdminController::class, 'apiCredentials'])->name('api-credentials');
+    Route::get('/api-credentials/{id}/edit', [\App\Http\Controllers\Admin\AdminController::class, 'apiCredentialEdit'])->name('api-credentials.edit');
+    Route::put('/api-credentials/{id}', [\App\Http\Controllers\Admin\AdminController::class, 'apiCredentialUpdate'])->name('api-credentials.update');
+});
+
 require __DIR__.'/auth.php';

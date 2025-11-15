@@ -14,6 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
+
+        // Exclude Telegram webhooks and payment callbacks from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            '/telegram/webhook/*',
+            '/payments/paypal/*',
+            '/payments/pagopar/*',
+            '/payments/bancard/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

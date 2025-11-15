@@ -89,4 +89,13 @@ Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
+// Telegram Webhooks (public routes)
+Route::post('/telegram/webhook/asistente-personal', [\App\Http\Controllers\TelegramWebhookController::class, 'asistentePersonal'])->name('telegram.asistente');
+Route::post('/telegram/webhook/organizador-agenda', [\App\Http\Controllers\TelegramWebhookController::class, 'organizadorAgenda'])->name('telegram.agenda');
+Route::post('/telegram/webhook/cryptoshield', [\App\Http\Controllers\TelegramWebhookController::class, 'cryptoShield'])->name('telegram.cryptoshield');
+Route::post('/telegram/webhook/pulse-ia', [\App\Http\Controllers\TelegramWebhookController::class, 'pulseIA'])->name('telegram.pulseia');
+Route::post('/telegram/webhook/momentum-predictor', [\App\Http\Controllers\TelegramWebhookController::class, 'momentumPredictor'])->name('telegram.momentum');
+Route::post('/telegram/webhook/agente-ventas', [\App\Http\Controllers\TelegramWebhookController::class, 'agenteVentas'])->name('telegram.ventas');
+Route::post('/telegram/webhook/support', [\App\Http\Controllers\TelegramWebhookController::class, 'supportBot'])->name('telegram.support');
+
 require __DIR__.'/auth.php';

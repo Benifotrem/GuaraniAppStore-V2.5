@@ -1,2 +1,25 @@
+# Robots.txt for Guarani App Store
+# Generated: 2025-11-15
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /subscriptions
+Disallow: /payments
+Disallow: /auth/
+
+# Allow legal pages
+Allow: /faq
+Allow: /terms
+Allow: /privacy
+
+# Allow service pages
+Allow: /servicios/
+
+# Crawl-delay for politeness
+Crawl-delay: 10
+
+# Sitemap (update with your actual domain)
+Sitemap: https://yourdomain.com/sitemap.xml

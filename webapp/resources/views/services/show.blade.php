@@ -4,6 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $service->name }} - {{ config('app.name') }}</title>
+    <meta name="description" content="{{ $service->description }}">
+
+    <!-- Schema.org Product Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "{{ $service->name }}",
+        "description": "{{ $service->description }}",
+        "brand": {
+            "@type": "Organization",
+            "name": "Guarani App Store"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "{{ $service->price }}",
+            "priceCurrency": "PYG",
+            "availability": "{{ $service->status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder' }}",
+            "seller": {
+                "@type": "Organization",
+                "name": "Guarani App Store"
+            }
+            @if($service->trial_days > 0)
+            ,
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": "0",
+                "priceCurrency": "PYG",
+                "name": "Trial gratuito {{ $service->trial_days }} días"
+            }
+            @endif
+        }
+    }
+    </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

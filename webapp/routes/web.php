@@ -3,9 +3,11 @@
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 // Landing Page
@@ -78,5 +80,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/api-credentials/{id}/edit', [\App\Http\Controllers\Admin\AdminController::class, 'apiCredentialEdit'])->name('api-credentials.edit');
     Route::put('/api-credentials/{id}', [\App\Http\Controllers\Admin\AdminController::class, 'apiCredentialUpdate'])->name('api-credentials.update');
 });
+
+// Legal Pages
+Route::get('/faq', [LegalController::class, 'faq'])->name('faq');
+Route::get('/terms', [LegalController::class, 'terms'])->name('terms');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
+
+// SEO
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 require __DIR__.'/auth.php';

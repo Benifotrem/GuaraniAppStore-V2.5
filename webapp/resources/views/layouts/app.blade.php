@@ -4,8 +4,31 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="description" content="Plataforma de servicios digitales premium con 7 días de prueba gratuita. Marketing, gestión de redes, automatización, desarrollo web y más.">
+        <meta name="keywords" content="servicios digitales, suscripción, marketing digital, automatización, desarrollo web, Guarani App Store">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Schema.org Organization Markup -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Guarani App Store",
+            "description": "Plataforma de servicios digitales premium con trial gratuito de 7 días",
+            "url": "{{ url('/') }}",
+            "logo": "{{ url('/images/logo.png') }}",
+            "sameAs": [
+                "https://twitter.com/guaraniappstore",
+                "https://facebook.com/guaraniappstore"
+            ],
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Support",
+                "email": "soporte@guaraniappstore.com"
+            }
+        }
+        </script>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

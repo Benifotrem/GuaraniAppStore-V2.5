@@ -9,6 +9,40 @@
     <meta name="description" content="Automatiza tu empresa con 11 servicios de IA: Agente de Ventas, Organizador de Facturas OCR, Suite Crypto y más. Trial 7 días GRATIS.">
     <meta name="keywords" content="automatización, IA, chatbot, OCR facturas, criptomonedas, Paraguay">
 
+    <!-- Schema.org WebSite Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Guarani App Store",
+        "url": "{{ url('/') }}",
+        "description": "Plataforma de servicios digitales premium con trial gratuito de 7 días",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ url('/servicios') }}?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <!-- Schema.org Offer Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Offer",
+        "name": "Trial Gratuito 7 Días",
+        "description": "Prueba gratis todos nuestros servicios por 7 días sin necesidad de tarjeta de crédito",
+        "price": "0",
+        "priceCurrency": "PYG",
+        "availability": "https://schema.org/InStock",
+        "validFrom": "{{ now()->toIso8601String() }}",
+        "seller": {
+            "@type": "Organization",
+            "name": "Guarani App Store"
+        }
+    }
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>

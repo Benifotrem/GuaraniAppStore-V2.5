@@ -118,4 +118,57 @@ class User extends Authenticatable
     {
         return $this->hasMany(ConsultancyRequest::class);
     }
+
+    /**
+     * Helper Methods
+     */
+
+    /**
+     * Check if user is on trial
+     */
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    /**
+     * Get trial days remaining
+     */
+    public function trialDaysRemaining(): int
+    {
+        if (!$this->onTrial()) {
+            return 0;
+        }
+
+        return now()->diffInDays($this->trial_ends_at);
+    }
+
+    /**
+     * Check if user has active subscription to a service
+     */
+    public function hasActiveSubscription($serviceSlug): bool
+    {
+        return $this->subscriptions()
+            ->whereHas('service', function ($query) use ($serviceSlug) {
+                $query->where('slug', $serviceSlug);
+            })
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user can access a service (has subscription or on trial)
+     */
+    public function canAccessService($serviceSlug): bool
+    {
+        return $this->onTrial() || $this->hasActiveSubscription($serviceSlug);
+    }
 }

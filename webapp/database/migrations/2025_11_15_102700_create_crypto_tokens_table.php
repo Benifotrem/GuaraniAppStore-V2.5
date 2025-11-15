@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('crypto_tokens', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('symbol');
+            $table->string('name');
+            $table->string('contract_address')->nullable();
+            $table->enum('blockchain', ['ethereum', 'bsc', 'polygon']);
+            $table->integer('fraud_score')->nullable();
+            $table->integer('sentiment_score')->nullable();
+            $table->enum('momentum_signal', ['buy', 'sell', 'hold'])->nullable();
+            $table->json('analysis_data')->nullable();
+            $table->timestamp('last_analyzed_at')->nullable();
             $table->timestamps();
         });
     }

@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('sales_conversations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('lead_name');
+            $table->string('lead_email');
+            $table->string('lead_phone');
+            $table->json('conversation_history');
+            $table->integer('score');
+            $table->enum('status', ['active', 'closed', 'transferred']);
             $table->timestamps();
         });
     }

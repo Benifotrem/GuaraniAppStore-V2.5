@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('ecommerce_products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('sku')->nullable();
+            $table->text('description')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->integer('stock')->default(0);
+            $table->json('images')->nullable();
+            $table->enum('status', ['active', 'inactive', 'out_of_stock']);
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

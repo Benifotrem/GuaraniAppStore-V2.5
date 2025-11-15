@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('cv_analyses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('candidate_name');
+            $table->string('candidate_email');
+            $table->string('candidate_phone')->nullable();
+            $table->string('cv_file_path');
+            $table->json('extracted_data');
+            $table->integer('score');
+            $table->enum('recommendation', ['interview', 'second_round', 'reject']);
+            $table->json('strengths')->nullable();
+            $table->json('weaknesses')->nullable();
             $table->timestamps();
         });
     }

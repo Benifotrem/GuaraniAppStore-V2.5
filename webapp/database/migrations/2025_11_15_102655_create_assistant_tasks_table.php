@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('assistant_tasks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('task_type', ['calendar', 'finance', 'search', 'reminder']);
+            $table->string('title');
+            $table->text('description');
+            $table->timestamp('due_date')->nullable();
+            $table->enum('status', ['pending', 'completed', 'cancelled']);
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

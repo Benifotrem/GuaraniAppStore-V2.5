@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('social_posts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('platform', ['linkedin', 'twitter', 'instagram', 'facebook']);
+            $table->text('content');
+            $table->json('hashtags')->nullable();
+            $table->timestamp('scheduled_for')->nullable();
+            $table->enum('status', ['draft', 'scheduled', 'published', 'failed']);
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
     }

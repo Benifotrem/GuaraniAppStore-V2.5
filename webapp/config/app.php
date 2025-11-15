@@ -134,4 +134,15 @@ return [
 
     'trial_days' => env('TRIAL_DAYS', 7),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cryptocurrency Discount
+    |--------------------------------------------------------------------------
+    |
+    | Discount percentage for payments made with cryptocurrency.
+    |
+    */
+
+    'crypto_discount_percent' => env('CRYPTO_DISCOUNT_PERCENT', 25),
+
 ];

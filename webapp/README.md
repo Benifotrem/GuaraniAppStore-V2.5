@@ -1,59 +1,249 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GuaraniAppStore V2.5 - Laravel Edition
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Plataforma de automatización empresarial con 11 servicios de IA y suscripciones
 
-## About Laravel
+[![Laravel](https://img.shields.io/badge/Laravel-12-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-Proprietary-yellow.svg)]()
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Tabla de Contenidos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Características](#-características)
+- [Servicios Disponibles](#-servicios-disponibles)
+- [Requisitos del Sistema](#-requisitos-del-sistema)
+- [Instalación](#-instalación)
+- [Configuración](#-configuración)
+- [Deployment en Hostinger](#-deployment-en-hostinger)
+- [Telegram Bots](#-telegram-bots)
+- [Pasarelas de Pago](#-pasarelas-de-pago)
+- [Comandos Útiles](#-comandos-útiles)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Características
 
-## Learning Laravel
+- ✅ **11 Servicios** (8 con trial de 7 días, 3 de pago único)
+- ✅ **Sistema de Suscripciones** con trial gratuito
+- ✅ **4 Pasarelas de Pago**: PayPal, Pagopar, Bancard, Criptomonedas
+- ✅ **7 Bots de Telegram** integrados
+- ✅ **Panel de Administración** completo
+- ✅ **Google OAuth** para autenticación
+- ✅ **SEO Optimizado** (Sitemap, Robots.txt, Schema.org)
+- ✅ **Diseño Glass Morphism** responsive
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📦 Servicios Disponibles
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Servicios de Pago Único
+1. **Ruptura del Hielo** (₲150,000) - Prospección comercial con IA
+2. **Preselección Curricular** (₲200,000) - Análisis de CVs con OCR
+3. **Consultoría Técnica** (₲500,000) - Análisis empresarial profundo
 
-## Laravel Sponsors
+### Servicios de Suscripción (Trial 7 días)
+4. **Asistente Personal** (₲300,000/mes) - Asistente ejecutivo 24/7
+5. **Organizador de Facturas** (₲250,000/mes) - OCR de facturas
+6. **Organizador de Agenda** (₲200,000/mes) - Agendamiento automático
+7. **Suite Crypto** (₲400,000/mes) - 3 bots para trading
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Servicios Próximamente
+8. **Agente de Ventas IA** (₲350,000/mes)
+9. **Generador de Blogs** (₲280,000/mes)
+10. **Automatización E-commerce** (₲320,000/mes)
+11. **Automatización Redes** (₲300,000/mes)
 
-### Premium Partners
+## 💻 Requisitos del Sistema
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- **PHP**: 8.2+ (recomendado 8.4)
+- **Composer**: 2.6+
+- **Node.js**: 18.x+
+- **MySQL**: 5.7+ o MariaDB 10.3+
+- **Servidor**: Compatible con Hostinger
 
-## Contributing
+## 📥 Instalación
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Clonar y Dependencias
 
-## Code of Conduct
+```bash
+git clone <repo-url>
+cd webapp
+composer install --optimize-autoloader --no-dev
+npm install && npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Configurar Entorno
 
-## Security Vulnerabilities
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Base de Datos
 
-## License
+```bash
+# Configurar credenciales en .env
+php artisan migrate --seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4. Storage
+
+```bash
+php artisan storage:link
+```
+
+## ⚙️ Configuración
+
+### Variables Críticas
+
+```env
+# App
+APP_NAME="GuaraniAppStore"
+APP_URL=https://tudominio.com
+
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# OpenRouter (IA)
+OPENROUTER_API_KEY=sk-or-v1-xxxxx
+
+# PayPal
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+
+# Telegram (7 bots)
+TELEGRAM_BOT_ASSISTANT_TOKEN=
+TELEGRAM_BOT_AGENDA_TOKEN=
+TELEGRAM_BOT_CRYPTOSHIELD_TOKEN=
+TELEGRAM_BOT_PULSE_TOKEN=
+TELEGRAM_BOT_MOMENTUM_TOKEN=
+TELEGRAM_BOT_SALES_TOKEN=
+TELEGRAM_BOT_SOCIAL_TOKEN=
+```
+
+## 🌐 Deployment en Hostinger
+
+### Paso 1: Preparación
+1. Adquirir plan Business/Premium
+2. Crear base de datos MySQL
+3. Configurar dominio y SSL
+
+### Paso 2: Subir Archivos
+```bash
+# Via SSH
+cd public_html
+git clone <repo-url> .
+cd webapp
+composer install --optimize-autoloader --no-dev
+npm install && npm run build
+```
+
+### Paso 3: Configurar
+```bash
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed --force
+chmod -R 755 storage bootstrap/cache
+```
+
+### Paso 4: Optimizar
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### Paso 5: Cron Job
+```
+* * * * * cd /home/usuario/public_html/webapp && php artisan schedule:run >> /dev/null 2>&1
+```
+
+## 🤖 Telegram Bots
+
+### Crear Bots
+1. Contactar @BotFather en Telegram
+2. Crear 7 bots:
+   - @AsistentePersonalBot
+   - @OrganizadorAgendaBot
+   - @CryptoShieldBot
+   - @PulseIABot
+   - @MomentumPredictorBot
+   - @AgenteVentasIABot
+   - @GuaraniSupportBot
+
+### Configurar Webhooks
+```bash
+# Agregar tokens a .env
+php artisan telegram:setup-webhooks
+
+# Verificar estado
+php artisan telegram:info
+```
+
+## 💳 Pasarelas de Pago
+
+- **PayPal**: Developer Dashboard
+- **Pagopar**: https://pagopar.com
+- **Bancard**: Contacto directo
+- **Crypto**: Wallets BTC/ETH/USDT
+
+## 🛠️ Comandos Útiles
+
+```bash
+# Telegram
+php artisan telegram:setup-webhooks
+php artisan telegram:info [bot]
+
+# Caché
+php artisan cache:clear
+php artisan config:cache
+
+# Database
+php artisan migrate
+php artisan db:seed
+
+# Mantenimiento
+php artisan down
+php artisan up
+```
+
+## 📁 Estructura
+
+```
+webapp/
+├── app/
+│   ├── Console/Commands/      # Telegram commands
+│   ├── Http/Controllers/
+│   │   ├── Admin/             # Panel admin
+│   │   ├── Services/          # 11 servicios
+│   │   └── TelegramWebhookController.php
+│   ├── Models/
+│   └── Services/
+│       └── TelegramService.php
+├── config/
+│   └── telegram.php
+├── resources/views/
+│   ├── admin/
+│   ├── legal/
+│   └── services/
+├── .env.example
+└── README.md
+```
+
+## 🔒 Seguridad
+
+- ✅ CSRF Protection
+- ✅ SQL Injection Prevention
+- ✅ XSS Protection
+- ✅ Password Hashing (bcrypt)
+- ✅ HTTPS Obligatorio
+- ✅ Input Validation
+
+## 📧 Soporte
+
+Email: soporte@guaraniappstore.com  
+Telegram: @GuaraniSupportBot
+
+## 📄 Licencia
+
+Propietaria. Todos los derechos reservados.
+
+---
+
+**Desarrollado con ❤️ en Paraguay** 🇵🇾

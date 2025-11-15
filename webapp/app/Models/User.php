@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'trial_ends_at',
     ];
 
     /**
@@ -43,6 +44,75 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'trial_ends_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Relaciones
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class);
+    }
+
+    public function salesConversations()
+    {
+        return $this->hasMany(SalesConversation::class);
+    }
+
+    public function assistantTasks()
+    {
+        return $this->hasMany(AssistantTask::class);
+    }
+
+    public function blogPosts()
+    {
+        return $this->hasMany(BlogPost::class);
+    }
+
+    public function ecommerceProducts()
+    {
+        return $this->hasMany(EcommerceProduct::class);
+    }
+
+    public function cvAnalyses()
+    {
+        return $this->hasMany(CvAnalysis::class);
+    }
+
+    public function socialPosts()
+    {
+        return $this->hasMany(SocialPost::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function cryptoTokens()
+    {
+        return $this->hasMany(CryptoToken::class);
+    }
+
+    public function consultancyRequests()
+    {
+        return $this->hasMany(ConsultancyRequest::class);
     }
 }

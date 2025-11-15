@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
@@ -10,6 +11,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Servicios públicos
 Route::get('/servicios/{slug}', [ServiceController::class, 'show'])->name('services.show');
+
+// Google OAuth
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 // Dashboard (requiere autenticación)
 Route::get('/dashboard', function () {

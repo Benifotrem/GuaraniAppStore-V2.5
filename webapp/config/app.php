@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Trial Period Settings
+    |--------------------------------------------------------------------------
+    |
+    | Number of days for free trial period when users register.
+    |
+    */
+
+    'trial_days' => env('TRIAL_DAYS', 7),
+
 ];
